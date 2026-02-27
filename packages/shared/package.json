@@ -1,0 +1,25 @@
+{
+  "name": "@cheatsheet/shared",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "framer-motion": "^12.34.3",
+    "fuse.js": "^7.1.0",
+    "js-yaml": "^4.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "smol-toml": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.9.3"
+  }
+}
