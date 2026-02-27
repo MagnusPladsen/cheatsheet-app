@@ -16,7 +16,7 @@ export function AppSection({ appId, bindings, index }: AppSectionProps) {
   if (bindings.length === 0) return null;
 
   const grouped = bindings.reduce<Record<string, Binding[]>>((acc, b) => {
-    const cat = b.category || "General";
+    const cat = b.category || "general";
     (acc[cat] ??= []).push(b);
     return acc;
   }, {});
@@ -27,37 +27,34 @@ export function AppSection({ appId, bindings, index }: AppSectionProps) {
   return (
     <section
       className="animate-fade-up"
-      style={{ animationDelay: `${index * 60}ms` }}
+      style={{ animationDelay: `${index * 40}ms` }}
     >
-      {/* Section header — editorial rule style */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center gap-4 w-full text-left group pb-3 border-b border-border mb-4"
+        className="flex items-center gap-2 w-full text-left group pb-2 border-b border-border mb-3"
       >
-        <span className="text-lg">{app.icon}</span>
-        <h2 className="font-display text-xl font-700 text-text-primary tracking-tight">
-          {app.name}
-        </h2>
-        <span className="font-mono text-[11px] text-text-muted tracking-wider">
-          {bindings.length}
+        <span className="text-accent text-xs">#</span>
+        <h2 className="text-xs font-bold text-text-primary">{app.name}</h2>
+        <span className="text-[10px] text-text-muted tracking-wider">
+          [{bindings.length}]
           {customCount > 0 && defaultCount > 0 && (
-            <span className="text-text-muted/60"> — {customCount}c / {defaultCount}d</span>
+            <span className="ml-1 text-text-muted/50">{customCount}c/{defaultCount}d</span>
           )}
         </span>
         <span
-          className="font-mono text-[10px] text-text-muted ml-auto transition-transform duration-150"
+          className="text-[10px] text-text-muted ml-auto transition-transform duration-100"
           style={{ transform: collapsed ? "rotate(-90deg)" : "rotate(0)" }}
         >
-          ▼
+          ▾
         </span>
       </button>
 
       {!collapsed && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {Object.entries(grouped).map(([category, catBindings]) => (
             <div key={category}>
-              <h3 className="font-mono text-[10px] font-500 uppercase tracking-[0.2em] text-accent mb-2 pl-0.5">
-                {category}
+              <h3 className="text-[10px] text-accent/50 tracking-widest mb-1.5 pl-0.5">
+                -- {category}
               </h3>
               <div className="grid gap-px sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {catBindings.map((b) => (

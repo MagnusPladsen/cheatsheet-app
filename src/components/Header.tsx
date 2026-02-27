@@ -12,18 +12,17 @@ interface HeaderProps {
 
 export function Header({ theme, onToggleTheme, onRefresh, loading, lastFetched, totalBindings }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg-primary/90 border-b border-border">
-      <div className="max-w-6xl mx-auto px-6 py-5 flex items-end justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-800 tracking-tight text-text-primary">
-            cheatsheet
-            <span className="text-accent">.</span>
-          </h1>
-          <p className="font-mono text-[11px] text-text-muted mt-1 tracking-wide uppercase">
-            {totalBindings} bindings — live from dotfiles
-          </p>
-        </div>
+    <header className="sticky top-0 z-50 bg-bg-primary/95 backdrop-blur-sm border-b border-border">
+      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <h1 className="font-display text-sm font-bold text-text-primary">
+            <span className="text-accent">~/</span>cheatsheet
+          </h1>
+          <span className="text-[10px] text-text-muted tracking-wider">
+            // {totalBindings} bindings · live from dotfiles
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
           <RefreshButton onRefresh={onRefresh} loading={loading} lastFetched={lastFetched} />
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         </div>

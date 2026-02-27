@@ -13,10 +13,10 @@ export function RefreshButton({ onRefresh, loading, lastFetched }: RefreshButton
     <button
       onClick={onRefresh}
       disabled={loading}
-      className="flex items-center gap-2 px-3 h-8 border border-border text-text-muted hover:text-accent hover:border-accent/30 transition-colors font-mono text-[11px] tracking-wider disabled:opacity-40"
+      className="flex items-center gap-1.5 px-2 h-7 border border-border text-text-muted hover:text-accent hover:border-accent/20 transition-colors text-[10px] tracking-wider disabled:opacity-30"
     >
       <span className={loading ? "animate-spin" : ""}>↻</span>
-      {timeAgo && <span className="uppercase">{timeAgo}</span>}
+      {timeAgo && <span>{timeAgo}</span>}
     </button>
   );
 }

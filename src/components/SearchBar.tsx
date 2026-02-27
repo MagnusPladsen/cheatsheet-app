@@ -31,27 +31,27 @@ export function SearchBar({ value, onChange, resultCount, totalCount }: SearchBa
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       <div className="relative group">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-text-muted group-focus-within:text-accent transition-colors">
-          /
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-text-muted group-focus-within:text-accent transition-colors">
+          &gt;
         </span>
         <input
           ref={inputRef}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="search bindings..."
-          className="w-full pl-10 pr-24 py-3 bg-bg-card border border-border text-text-primary font-body text-sm placeholder:text-text-muted focus:outline-none focus:border-accent/50 focus:bg-bg-secondary transition-colors"
+          placeholder="grep bindings..."
+          className="w-full pl-8 pr-24 py-2.5 bg-bg-card border border-border text-text-primary text-xs placeholder:text-text-muted/50 focus:outline-none focus:border-accent/30 transition-colors"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
           {value && (
             <button
               onClick={() => onChange("")}
-              className="font-mono text-xs text-text-muted hover:text-text-primary transition-colors"
+              className="text-[10px] text-text-muted hover:text-accent transition-colors"
             >
-              ESC
+              esc
             </button>
           )}
-          <span className="font-mono text-[11px] text-text-muted tabular-nums">
+          <span className="text-[10px] text-text-muted tabular-nums">
             {resultCount}/{totalCount}
           </span>
         </div>

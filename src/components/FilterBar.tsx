@@ -15,9 +15,9 @@ interface FilterBarProps {
 }
 
 const filterOptions: { value: BindingFilter; label: string }[] = [
-  { value: "all", label: "ALL" },
-  { value: "custom", label: "CUSTOM" },
-  { value: "default", label: "DEFAULT" },
+  { value: "all", label: "all" },
+  { value: "custom", label: "custom" },
+  { value: "default", label: "default" },
 ];
 
 export function FilterBar({
@@ -27,39 +27,38 @@ export function FilterBar({
   const hasFilters = activeApps.length > 0 || bindingFilter !== "all" || activeCategory;
 
   return (
-    <div className="space-y-4">
-      {/* App filters */}
-      <div className="flex flex-wrap gap-1.5 justify-center">
+    <div className="space-y-3">
+      {/* app filters */}
+      <div className="flex flex-wrap gap-1 justify-center">
         {APP_LIST.map((app) => {
           const active = activeApps.includes(app.id);
           return (
             <button
               key={app.id}
               onClick={() => onToggleApp(app.id)}
-              className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider border transition-colors ${
+              className={`px-2.5 py-1 text-[11px] tracking-wider border transition-colors ${
                 active
-                  ? "bg-accent-dim border-accent/40 text-accent"
-                  : "bg-transparent border-border text-text-muted hover:border-border-hover hover:text-text-secondary"
+                  ? "border-accent/40 text-accent bg-accent-dim"
+                  : "border-border text-text-muted hover:text-text-secondary hover:border-border-hover"
               }`}
             >
-              <span className="mr-1.5">{app.icon}</span>
               {app.name}
             </button>
           );
         })}
       </div>
 
-      {/* Binding type toggle + category */}
-      <div className="flex flex-wrap gap-2 justify-center items-center">
-        <div className="inline-flex border border-border overflow-hidden">
+      {/* binding type + category */}
+      <div className="flex flex-wrap gap-1.5 justify-center items-center">
+        <div className="inline-flex border border-border">
           {filterOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => onSetBindingFilter(opt.value)}
-              className={`px-3 py-1.5 text-[11px] font-mono tracking-widest transition-colors ${
+              className={`px-2.5 py-1 text-[10px] tracking-wider transition-colors ${
                 bindingFilter === opt.value
                   ? "bg-accent-dim text-accent"
-                  : "bg-transparent text-text-muted hover:text-text-secondary"
+                  : "text-text-muted hover:text-text-secondary"
               }`}
             >
               {opt.label}
@@ -71,11 +70,11 @@ export function FilterBar({
           <select
             value={activeCategory || ""}
             onChange={(e) => onSetCategory(e.target.value || null)}
-            className="px-3 py-1.5 text-xs font-mono bg-bg-card border border-border text-text-muted focus:border-accent/40 focus:outline-none uppercase tracking-wider"
+            className="px-2.5 py-1 text-[10px] bg-bg-card border border-border text-text-muted focus:border-accent/30 focus:outline-none tracking-wider"
           >
-            <option value="">ALL CATEGORIES</option>
+            <option value="">all categories</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c.toUpperCase()}</option>
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
         )}
@@ -83,9 +82,9 @@ export function FilterBar({
         {hasFilters && (
           <button
             onClick={onReset}
-            className="px-3 py-1.5 text-[11px] font-mono text-text-muted hover:text-accent transition-colors tracking-wider"
+            className="px-2.5 py-1 text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider"
           >
-            CLEAR
+            clear
           </button>
         )}
       </div>

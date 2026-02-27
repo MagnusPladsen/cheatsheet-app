@@ -40,7 +40,7 @@ export default function App() {
         totalBindings={bindings.length}
       />
 
-      <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+      <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         <SearchBar
           value={filters.search}
           onChange={setSearch}
@@ -63,21 +63,21 @@ export default function App() {
           <LoadingState />
         ) : error ? (
           <div className="text-center py-24">
-            <p className="font-mono text-sm text-red-400 mb-2">ERROR</p>
-            <p className="text-text-muted text-sm mb-6">{error}</p>
-            <button onClick={refresh} className="px-4 py-2 border border-accent text-accent font-mono text-xs tracking-wider hover:bg-accent-dim transition-colors">
-              RETRY
+            <p className="text-xs text-text-secondary mb-2">[error] failed to fetch</p>
+            <p className="text-[10px] text-text-muted mb-4">{error}</p>
+            <button onClick={refresh} className="px-3 py-1.5 border border-accent/30 text-accent text-[10px] tracking-wider hover:bg-accent-dim transition-colors">
+              retry
             </button>
           </div>
         ) : results.length === 0 ? (
           <div className="text-center py-24">
-            <p className="font-mono text-sm text-text-muted tracking-wider">NO MATCHES</p>
-            <button onClick={resetFilters} className="mt-4 font-mono text-xs text-accent hover:text-accent-light transition-colors tracking-wider">
-              CLEAR FILTERS
+            <p className="text-xs text-text-muted tracking-wider">no matches found</p>
+            <button onClick={resetFilters} className="mt-3 text-[10px] text-accent hover:text-accent-light transition-colors tracking-wider">
+              clear filters
             </button>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8">
             {entries.map(([appId, appBindings], i) => (
               <AppSection key={appId} appId={appId} bindings={appBindings} index={i} />
             ))}
@@ -85,13 +85,13 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-border py-8 text-center">
-        <p className="font-mono text-[10px] text-text-muted tracking-widest uppercase">
-          live from{" "}
-          <a href="https://github.com/MagnusPladsen/dotfiles" className="text-accent/70 hover:text-accent transition-colors" target="_blank" rel="noreferrer">
+      <footer className="border-t border-border py-6 text-center">
+        <p className="text-[10px] text-text-muted tracking-wider">
+          // live from{" "}
+          <a href="https://github.com/MagnusPladsen/dotfiles" className="text-accent/40 hover:text-accent transition-colors" target="_blank" rel="noreferrer">
             dotfiles
           </a>
-          {" "}&middot; press <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-[9px] font-mono">/</kbd> to search
+          {" "}· press <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-[9px] text-accent">/</kbd> to search
         </p>
       </footer>
     </div>

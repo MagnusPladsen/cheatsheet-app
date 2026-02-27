@@ -7,32 +7,27 @@ interface BindingCardProps {
 
 export function BindingCard({ binding }: BindingCardProps) {
   return (
-    <div className="card-hover-accent flex items-start gap-3 px-3 py-2.5 bg-bg-card border border-border transition-colors duration-150">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <KbdBadge keys={binding.key} />
-          {binding.mode && (
-            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-bg-secondary text-text-muted uppercase tracking-widest border border-border">
-              {binding.mode}
-            </span>
-          )}
-          {binding.isCustom ? (
-            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-warm-dim text-warm uppercase tracking-widest">
-              custom
-            </span>
-          ) : (
-            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-bg-secondary text-text-muted uppercase tracking-widest">
-              default
-            </span>
-          )}
-        </div>
-        <p className="text-sm text-text-secondary font-body truncate">{binding.action}</p>
+    <div className="card-hover-accent flex items-center gap-3 px-3 py-1.5 bg-bg-card border border-border">
+      <KbdBadge keys={binding.key} />
+      <p className="flex-1 min-w-0 text-[11px] text-text-secondary truncate">
+        {binding.action}
+      </p>
+      <div className="flex items-center gap-1 shrink-0">
+        {binding.mode && (
+          <span className="text-[9px] px-1 py-0.5 text-text-muted border border-border">
+            {binding.mode}
+          </span>
+        )}
+        {binding.isCustom ? (
+          <span className="text-[9px] px-1 py-0.5 text-accent/70 bg-accent-dim">
+            cstm
+          </span>
+        ) : (
+          <span className="text-[9px] px-1 py-0.5 text-text-muted bg-bg-secondary">
+            dflt
+          </span>
+        )}
       </div>
-      {binding.category && (
-        <span className="shrink-0 font-mono text-[9px] px-1.5 py-0.5 text-text-muted uppercase tracking-widest">
-          {binding.category}
-        </span>
-      )}
     </div>
   );
 }
