@@ -20,7 +20,7 @@ export function SearchBar({ value, onChange, resultCount, totalCount, inputRef }
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={lc("grep bindings...")}
+          placeholder={lc("fuzzy search bindings...")}
           className="w-full pl-8 pr-24 py-2.5 bg-bg-card border border-border text-text-primary text-sm placeholder:text-text-muted/50 focus:outline-none focus:border-accent/30 transition-colors"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
