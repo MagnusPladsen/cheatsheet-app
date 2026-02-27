@@ -44,28 +44,16 @@
   --color-warm: #00ff88;
   --color-warm-dim: rgba(0, 255, 136, 0.06);
 
-  /* light mode */
-  --color-bg-primary-light: #f6f6f6;
-  --color-bg-secondary-light: #ededed;
-  --color-bg-card-light: #ffffff;
-  --color-bg-card-hover-light: #f2f2f2;
-  --color-text-primary-light: #1a1a1a;
-  --color-text-secondary-light: #4a4a4a;
-  --color-text-muted-light: #808080;
-  --color-border-light: #dcdcdc;
-  --color-border-hover-light: #c8c8c8;
-  --color-kbd-bg-light: #ededed;
-  --color-kbd-border-light: #cccccc;
 }
 
 /* base */
 html {
   scroll-behavior: smooth;
+  font-size: 19px;
 }
 
 body {
   font-family: var(--font-mono);
-  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   background: var(--color-bg-primary);
   text-transform: lowercase;
@@ -88,24 +76,7 @@ body {
   pointer-events: none;
 }
 
-/* light theme */
-.light {
-  --color-bg-primary: var(--color-bg-primary-light);
-  --color-bg-secondary: var(--color-bg-secondary-light);
-  --color-bg-card: var(--color-bg-card-light);
-  --color-bg-card-hover: var(--color-bg-card-hover-light);
-  --color-text-primary: var(--color-text-primary-light);
-  --color-text-secondary: var(--color-text-secondary-light);
-  --color-text-muted: var(--color-text-muted-light);
-  --color-border: var(--color-border-light);
-  --color-border-hover: var(--color-border-hover-light);
-  --color-kbd-bg: var(--color-kbd-bg-light);
-  --color-kbd-border: var(--color-kbd-border-light);
-  --color-accent-dim: rgba(0, 255, 136, 0.05);
-  --color-accent-glow: rgba(0, 255, 136, 0.08);
-  --color-warm-dim: rgba(0, 255, 136, 0.05);
-}
-
+/* light themes: no scanlines */
 .light body::before {
   display: none;
 }
@@ -140,9 +111,9 @@ body {
   animation: blink 1s step-end infinite;
 }
 
-/* selection */
+/* selection — adapts to theme accent */
 ::selection {
-  background: rgba(0, 255, 136, 0.2);
+  background: var(--color-accent-glow);
   color: inherit;
 }
 

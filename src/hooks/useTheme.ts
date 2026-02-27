@@ -1,20 +1,29 @@
 import { useState, useEffect } from "react";
-
-type Theme = "dark" | "light";
+import { THEMES, type Theme } from "../themes";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("cheatsheet-theme");
-    return (stored as Theme) || "dark";
+  const [themeId, setThemeId] = useState(() => {
+    return localStorage.getItem("cheatsheet-theme") || "hacker";
   });
 
+  const theme = THEMES.find((t) => t.id === themeId) || THEMES[0];
+
   useEffect(() => {
-    localStorage.setItem("cheatsheet-theme", theme);
-    document.documentElement.classList.toggle("light", theme === "light");
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    const root = document.documentElement;
+
+    // dark/light class (for scanlines + body::before)
+    root.classList.remove("dark", "light");
+    root.classList.add(theme.isDark ? "dark" : "light");
+
+    // apply all css variables
+    for (const [key, value] of Object.entries(theme.colors)) {
+      root.style.setProperty(`--color-${key}`, value);
+    }
+
+    localStorage.setItem("cheatsheet-theme", theme.id);
   }, [theme]);
 
-  const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
-
-  return { theme, toggle };
+  return { theme, themes: THEMES, setTheme: setThemeId };
 }
+
+export type { Theme };

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { useBindings } from "./hooks/useBindings";
 import { useSearch } from "./hooks/useSearch";
 import { useTheme } from "./hooks/useTheme";
@@ -17,7 +17,50 @@ export default function App() {
     results, filters, setSearch, toggleApp, setBindingFilter,
     setCategory, resetFilters, categories, resultCount,
   } = useSearch(bindings);
-  const { theme, toggle: toggleTheme } = useTheme();
+  const { theme, themes, setTheme } = useTheme();
+
+  // search refs + scroll detection
+  const mainSearchRef = useRef<HTMLInputElement>(null);
+  const compactSearchRef = useRef<HTMLInputElement>(null);
+  const searchSentinelRef = useRef<HTMLDivElement>(null);
+  const [searchOutOfView, setSearchOutOfView] = useState(false);
+
+  useEffect(() => {
+    const el = searchSentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setSearchOutOfView(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // global keyboard: / to focus search, Esc to clear
+  const stableSetSearch = useCallback((v: string) => setSearch(v), [setSearch]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey) {
+        const tag = document.activeElement?.tagName;
+        if (tag !== "INPUT" && tag !== "TEXTAREA") {
+          e.preventDefault();
+          if (searchOutOfView) {
+            compactSearchRef.current?.focus();
+          } else {
+            mainSearchRef.current?.focus();
+          }
+        }
+      }
+      if (e.key === "Escape") {
+        mainSearchRef.current?.blur();
+        compactSearchRef.current?.blur();
+        stableSetSearch("");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [searchOutOfView, stableSetSearch]);
 
   const groupedByApp = useMemo(() => {
     const map = new Map<AppId, typeof results>();
@@ -34,20 +77,32 @@ export default function App() {
     <div className="min-h-screen bg-bg-primary text-text-primary">
       <Header
         theme={theme}
-        onToggleTheme={toggleTheme}
+        themes={themes}
+        onSetTheme={setTheme}
         onRefresh={refresh}
         loading={loading}
         lastFetched={lastFetched}
         totalBindings={bindings.length}
+        compactSearch={{
+          visible: searchOutOfView,
+          value: filters.search,
+          onChange: setSearch,
+          resultCount,
+          totalCount: bindings.length,
+          inputRef: compactSearchRef,
+        }}
       />
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
-        <SearchBar
-          value={filters.search}
-          onChange={setSearch}
-          resultCount={resultCount}
-          totalCount={bindings.length}
-        />
+        <div ref={searchSentinelRef}>
+          <SearchBar
+            value={filters.search}
+            onChange={setSearch}
+            resultCount={resultCount}
+            totalCount={bindings.length}
+            inputRef={mainSearchRef}
+          />
+        </div>
 
         <FilterBar
           activeApps={filters.apps}
