@@ -7,10 +7,10 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   return (
     <button
       onClick={onToggle}
-      className="p-2 rounded-lg bg-bg-card border border-border hover:border-accent/50 transition-all"
+      className="w-8 h-8 flex items-center justify-center border border-border text-text-muted hover:text-accent hover:border-accent/30 transition-colors font-mono text-xs"
       aria-label="Toggle theme"
     >
-      {theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+      {theme === "dark" ? "LT" : "DK"}
     </button>
   );
 }

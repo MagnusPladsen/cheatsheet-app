@@ -7,29 +7,29 @@ interface BindingCardProps {
 
 export function BindingCard({ binding }: BindingCardProps) {
   return (
-    <div className="flex items-start gap-3 p-3 rounded-lg bg-bg-card border border-border hover:border-accent/30 hover:bg-bg-card-hover transition-colors duration-150">
+    <div className="card-hover-accent flex items-start gap-3 px-3 py-2.5 bg-bg-card border border-border transition-colors duration-150">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <KbdBadge keys={binding.key} />
           {binding.mode && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-bg-secondary text-text-muted uppercase tracking-wider">
+            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-bg-secondary text-text-muted uppercase tracking-widest border border-border">
               {binding.mode}
             </span>
           )}
           {binding.isCustom ? (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-badge-custom/20 text-accent-light font-medium">
+            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-warm-dim text-warm uppercase tracking-widest">
               custom
             </span>
           ) : (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-badge-default/40 text-text-muted font-medium">
+            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-bg-secondary text-text-muted uppercase tracking-widest">
               default
             </span>
           )}
         </div>
-        <p className="text-sm text-text-secondary truncate">{binding.action}</p>
+        <p className="text-sm text-text-secondary font-body truncate">{binding.action}</p>
       </div>
       {binding.category && (
-        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-bg-secondary text-text-muted">
+        <span className="shrink-0 font-mono text-[9px] px-1.5 py-0.5 text-text-muted uppercase tracking-widest">
           {binding.category}
         </span>
       )}

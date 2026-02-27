@@ -15,9 +15,9 @@ interface FilterBarProps {
 }
 
 const filterOptions: { value: BindingFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "custom", label: "Custom" },
-  { value: "default", label: "Default" },
+  { value: "all", label: "ALL" },
+  { value: "custom", label: "CUSTOM" },
+  { value: "default", label: "DEFAULT" },
 ];
 
 export function FilterBar({
@@ -27,37 +27,39 @@ export function FilterBar({
   const hasFilters = activeApps.length > 0 || bindingFilter !== "all" || activeCategory;
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 justify-center">
+    <div className="space-y-4">
+      {/* App filters */}
+      <div className="flex flex-wrap gap-1.5 justify-center">
         {APP_LIST.map((app) => {
           const active = activeApps.includes(app.id);
           return (
             <button
               key={app.id}
               onClick={() => onToggleApp(app.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+              className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider border transition-colors ${
                 active
-                  ? "bg-accent/20 border-accent text-accent-light"
-                  : "bg-bg-card border-border text-text-secondary hover:border-accent/50"
+                  ? "bg-accent-dim border-accent/40 text-accent"
+                  : "bg-transparent border-border text-text-muted hover:border-border-hover hover:text-text-secondary"
               }`}
             >
-              {app.icon} {app.name}
+              <span className="mr-1.5">{app.icon}</span>
+              {app.name}
             </button>
           );
         })}
       </div>
 
+      {/* Binding type toggle + category */}
       <div className="flex flex-wrap gap-2 justify-center items-center">
-        {/* Custom / Default / All toggle */}
-        <div className="inline-flex rounded-full border border-border overflow-hidden">
+        <div className="inline-flex border border-border overflow-hidden">
           {filterOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => onSetBindingFilter(opt.value)}
-              className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 text-[11px] font-mono tracking-widest transition-colors ${
                 bindingFilter === opt.value
-                  ? "bg-accent/20 text-accent-light"
-                  : "bg-bg-card text-text-secondary hover:bg-bg-card-hover"
+                  ? "bg-accent-dim text-accent"
+                  : "bg-transparent text-text-muted hover:text-text-secondary"
               }`}
             >
               {opt.label}
@@ -69,11 +71,11 @@ export function FilterBar({
           <select
             value={activeCategory || ""}
             onChange={(e) => onSetCategory(e.target.value || null)}
-            className="px-3 py-1.5 rounded-full text-sm bg-bg-card border border-border text-text-secondary focus:border-accent focus:outline-none"
+            className="px-3 py-1.5 text-xs font-mono bg-bg-card border border-border text-text-muted focus:border-accent/40 focus:outline-none uppercase tracking-wider"
           >
-            <option value="">All Categories</option>
+            <option value="">ALL CATEGORIES</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>{c.toUpperCase()}</option>
             ))}
           </select>
         )}
@@ -81,9 +83,9 @@ export function FilterBar({
         {hasFilters && (
           <button
             onClick={onReset}
-            className="px-3 py-1.5 rounded-full text-sm text-text-muted hover:text-text-primary transition-colors"
+            className="px-3 py-1.5 text-[11px] font-mono text-text-muted hover:text-accent transition-colors tracking-wider"
           >
-            Clear filters
+            CLEAR
           </button>
         )}
       </div>

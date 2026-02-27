@@ -1,11 +1,21 @@
 export function LoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <div className="relative w-16 h-16">
-        <div className="absolute inset-0 rounded-full border-4 border-border" />
-        <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin" />
+    <div className="flex flex-col items-center justify-center py-24 gap-6">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="w-1 h-8 bg-accent/30"
+            style={{
+              animation: "pulse 1s ease-in-out infinite",
+              animationDelay: `${i * 100}ms`,
+            }}
+          />
+        ))}
       </div>
-      <p className="text-text-muted text-sm animate-pulse">Fetching bindings from GitHub...</p>
+      <p className="font-mono text-[11px] text-text-muted tracking-widest uppercase">
+        fetching from github...
+      </p>
     </div>
   );
 }

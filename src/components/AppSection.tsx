@@ -6,9 +6,10 @@ import { BindingCard } from "./BindingCard";
 interface AppSectionProps {
   appId: AppId;
   bindings: Binding[];
+  index: number;
 }
 
-export function AppSection({ appId, bindings }: AppSectionProps) {
+export function AppSection({ appId, bindings, index }: AppSectionProps) {
   const [collapsed, setCollapsed] = useState(false);
   const app = APPS[appId];
 
@@ -24,21 +25,30 @@ export function AppSection({ appId, bindings }: AppSectionProps) {
   const defaultCount = bindings.length - customCount;
 
   return (
-    <section>
+    <section
+      className="animate-fade-up"
+      style={{ animationDelay: `${index * 60}ms` }}
+    >
+      {/* Section header — editorial rule style */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center gap-3 w-full text-left mb-3 group"
+        className="flex items-center gap-4 w-full text-left group pb-3 border-b border-border mb-4"
       >
-        <span className="text-2xl">{app.icon}</span>
-        <h2 className={`text-xl font-bold ${app.color}`}>{app.name}</h2>
-        <span className="text-sm text-text-muted">
-          {bindings.length} {customCount > 0 && defaultCount > 0 && `(${customCount} custom, ${defaultCount} default)`}
+        <span className="text-lg">{app.icon}</span>
+        <h2 className="font-display text-xl font-700 text-text-primary tracking-tight">
+          {app.name}
+        </h2>
+        <span className="font-mono text-[11px] text-text-muted tracking-wider">
+          {bindings.length}
+          {customCount > 0 && defaultCount > 0 && (
+            <span className="text-text-muted/60"> — {customCount}c / {defaultCount}d</span>
+          )}
         </span>
         <span
-          className="text-text-muted ml-auto transition-transform duration-150"
+          className="font-mono text-[10px] text-text-muted ml-auto transition-transform duration-150"
           style={{ transform: collapsed ? "rotate(-90deg)" : "rotate(0)" }}
         >
-          ▾
+          ▼
         </span>
       </button>
 
@@ -46,10 +56,10 @@ export function AppSection({ appId, bindings }: AppSectionProps) {
         <div className="space-y-6">
           {Object.entries(grouped).map(([category, catBindings]) => (
             <div key={category}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-2 pl-1">
+              <h3 className="font-mono text-[10px] font-500 uppercase tracking-[0.2em] text-accent mb-2 pl-0.5">
                 {category}
               </h3>
-              <div className="grid gap-1.5 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-px sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {catBindings.map((b) => (
                   <BindingCard key={b.id} binding={b} />
                 ))}
