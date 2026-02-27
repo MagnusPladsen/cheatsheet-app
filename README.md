@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# cheatsheet
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Developer keybinding cheatsheet for neovim, tmux, aerospace, kitty, zed, zsh, and espanso. Parses your actual config files and displays all your bindings in a searchable UI.
 
-Currently, two official plugins are available:
+Available as a [web app](https://github.com/MagnusPladsen/my-cheatsheet) and a native desktop app (Tauri).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Install
 
-## React Compiler
+### macOS (Homebrew)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+brew tap MagnusPladsen/cheatsheet
+brew install --cask cheatsheet
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+> No code signing yet — on first launch, right-click the app and select "Open" to bypass Gatekeeper.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Arch Linux (AUR)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+yay -S cheatsheet-bin
+# or: paru -S cheatsheet-bin
 ```
+
+### Debian / Ubuntu / Linux Mint
+
+```bash
+# Download .deb from the latest release, then:
+sudo dpkg -i cheatsheet_1.0.0_amd64.deb
+sudo apt-get install -f  # install missing dependencies if needed
+```
+
+System dependencies: `libwebkit2gtk-4.1-0`, `libgtk-3-0`, `libatk1.0-0`
+
+### Fedora / RHEL
+
+```bash
+sudo rpm -i cheatsheet-1.0.0.x86_64.rpm
+```
+
+### AppImage (any Linux)
+
+```bash
+chmod +x cheatsheet_1.0.0_amd64.AppImage
+./cheatsheet_1.0.0_amd64.AppImage
+```
+
+## Development
+
+```bash
+bun install
+bun run dev:desktop   # desktop app (requires Rust + Tauri CLI)
+bun run dev:web       # web app
+```
+
+### Linux dev dependencies
+
+On Debian/Ubuntu/Mint, install these before building:
+
+```bash
+sudo apt-get install -y \
+  libwebkit2gtk-4.1-dev \
+  libgtk-3-dev \
+  libatk1.0-dev \
+  libappindicator3-dev \
+  librsvg2-dev \
+  patchelf
+```
+
+## Releasing
+
+Push a version tag to trigger a GitHub Actions build:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+This builds for macOS (arm64 + x64) and Linux (x64), creates a draft GitHub Release with all artifacts, and updates the Homebrew tap.

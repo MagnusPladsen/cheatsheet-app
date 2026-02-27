@@ -43,10 +43,11 @@ export function useSearch(bindings: Binding[]): UseSearchReturn {
           { name: "app", weight: 0.5 },
           { name: "mode", weight: 0.3 },
         ],
-        threshold: 0.5,
+        threshold: 0.2,
         ignoreLocation: true,
         findAllMatches: true,
-        minMatchCharLength: 1,
+        minMatchCharLength: 2,
+        useExtendedSearch: true,
       }),
     [bindings]
   );

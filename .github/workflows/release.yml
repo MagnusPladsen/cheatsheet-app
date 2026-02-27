@@ -1,0 +1,167 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libatk1.0-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+
+      - name: Install dependencies
+        run: bun install
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "cheatsheet v__VERSION__"
+          releaseDraft: true
+          prerelease: false
+          projectPath: apps/desktop
+          tauriScript: bunx tauri
+          args: ${{ matrix.args }}
+
+  update-homebrew:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for i in $(seq 1 30); do
+            count=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} \
+              --jq '.assets | length' 2>/dev/null || echo 0)
+            if [ "$count" -ge 3 ]; then
+              echo "Release assets ready ($count assets)"
+              break
+            fi
+            echo "Waiting for release assets... ($count so far)"
+            sleep 10
+          done
+
+      - name: Download macOS DMGs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${{ github.ref_name }} \
+            --repo ${{ github.repository }} \
+            --pattern "*.dmg" \
+            --dir artifacts
+
+      - name: Compute SHA256 checksums
+        id: sha
+        run: |
+          cd artifacts
+          for f in *.dmg; do
+            echo "File: $f"
+            sha256sum "$f"
+          done
+          ARM64_SHA=$(sha256sum *aarch64*.dmg | awk '{print $1}')
+          X64_SHA=$(sha256sum *x64*.dmg 2>/dev/null || sha256sum *x86_64*.dmg 2>/dev/null | awk '{print $1}')
+          echo "arm64=$ARM64_SHA" >> "$GITHUB_OUTPUT"
+          echo "x64=$X64_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Update Homebrew cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARM64_SHA="${{ steps.sha.outputs.arm64 }}"
+          X64_SHA="${{ steps.sha.outputs.x64 }}"
+
+          # Fetch current cask formula
+          CURRENT=$(curl -s -H "Authorization: token $HOMEBREW_TAP_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet.rb")
+
+          FILE_SHA=$(echo "$CURRENT" | jq -r '.sha')
+
+          # Generate updated formula
+          FORMULA=$(cat <<'RUBY'
+          cask "cheatsheet" do
+            arch arm: "aarch64", intel: "x64"
+
+            version "VERSION_PLACEHOLDER"
+            sha256 arm:   "ARM64_SHA_PLACEHOLDER",
+                   intel: "X64_SHA_PLACEHOLDER"
+
+            url "https://github.com/MagnusPladsen/my-cheatsheet/releases/download/v#{version}/cheatsheet_#{version}_#{arch}.dmg"
+            name "Cheatsheet"
+            desc "Developer keybinding cheatsheet for neovim, tmux, aerospace, and more"
+            homepage "https://github.com/MagnusPladsen/my-cheatsheet"
+
+            app "cheatsheet.app"
+
+            zap trash: [
+              "~/Library/Application Support/com.magnuspladsen.cheatsheet",
+            ]
+          end
+          RUBY
+          )
+
+          FORMULA="${FORMULA//VERSION_PLACEHOLDER/$VERSION}"
+          FORMULA="${FORMULA//ARM64_SHA_PLACEHOLDER/$ARM64_SHA}"
+          FORMULA="${FORMULA//X64_SHA_PLACEHOLDER/$X64_SHA}"
+
+          # Base64 encode
+          CONTENT=$(echo "$FORMULA" | base64 -w 0)
+
+          # Update file via GitHub API
+          curl -s -X PUT \
+            -H "Authorization: token $HOMEBREW_TAP_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet.rb" \
+            -d "{\"message\":\"Update cheatsheet to v${VERSION}\",\"content\":\"${CONTENT}\",\"sha\":\"${FILE_SHA}\"}"
