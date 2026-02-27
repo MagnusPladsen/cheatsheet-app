@@ -30,3 +30,16 @@
   --color-kbd-bg-light: #f1f5f9;
   --color-kbd-border-light: #d1d5db;
 }
+
+.light {
+  --color-bg-primary: var(--color-bg-primary-light);
+  --color-bg-secondary: var(--color-bg-secondary-light);
+  --color-bg-card: var(--color-bg-card-light);
+  --color-bg-card-hover: var(--color-bg-card-hover-light);
+  --color-text-primary: var(--color-text-primary-light);
+  --color-text-secondary: var(--color-text-secondary-light);
+  --color-text-muted: var(--color-text-muted-light);
+  --color-border: var(--color-border-light);
+  --color-kbd-bg: var(--color-kbd-bg-light);
+  --color-kbd-border: var(--color-kbd-border-light);
+}
