@@ -46,7 +46,7 @@
         "bundleMediaFramework": false
       },
       "rpm": {
-        "requires": ["webkit2gtk4.1", "gtk3"]
+        "depends": ["webkit2gtk4.1", "gtk3"]
       }
     }
   },
