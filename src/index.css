@@ -1,27 +1,46 @@
 @import "tailwindcss";
 
+/* cozette vector — self-hosted */
+@font-face {
+  font-family: "Cozette";
+  src: url("/fonts/CozetteVector.woff2") format("woff2"),
+       url("/fonts/CozetteVector.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cozette";
+  src: url("/fonts/CozetteVectorBold.woff2") format("woff2"),
+       url("/fonts/CozetteVectorBold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-display: "Space Mono", monospace;
-  --font-body: "Fira Code", "JetBrains Mono", monospace;
-  --font-mono: "Fira Code", "JetBrains Mono", monospace;
+  --font-display: "Cozette", monospace;
+  --font-body: "Cozette", monospace;
+  --font-mono: "Cozette", monospace;
 
   --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #111111;
-  --color-bg-card: #131313;
-  --color-bg-card-hover: #1a1a1a;
+  --color-bg-secondary: #121212;
+  --color-bg-card: #141414;
+  --color-bg-card-hover: #1c1c1c;
   --color-accent: #00ff88;
   --color-accent-light: #66ffbb;
   --color-accent-dim: rgba(0, 255, 136, 0.04);
   --color-accent-glow: rgba(0, 255, 136, 0.08);
-  --color-text-primary: #a0a0a0;
-  --color-text-secondary: #606060;
-  --color-text-muted: #333333;
-  --color-border: #1c1c1c;
-  --color-border-hover: #282828;
+  --color-text-primary: #c8c8c8;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
+  --color-border: #222222;
+  --color-border-hover: #333333;
   --color-badge-custom: #00ff88;
-  --color-badge-default: #282828;
-  --color-kbd-bg: #0e0e0e;
-  --color-kbd-border: #222222;
+  --color-badge-default: #333333;
+  --color-kbd-bg: #101010;
+  --color-kbd-border: #2a2a2a;
   --color-warm: #00ff88;
   --color-warm-dim: rgba(0, 255, 136, 0.06);
 
@@ -31,8 +50,8 @@
   --color-bg-card-light: #ffffff;
   --color-bg-card-hover-light: #f2f2f2;
   --color-text-primary-light: #1a1a1a;
-  --color-text-secondary-light: #505050;
-  --color-text-muted-light: #909090;
+  --color-text-secondary-light: #4a4a4a;
+  --color-text-muted-light: #808080;
   --color-border-light: #dcdcdc;
   --color-border-hover-light: #c8c8c8;
   --color-kbd-bg-light: #ededed;
@@ -46,7 +65,7 @@ html {
 
 body {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   background: var(--color-bg-primary);
   text-transform: lowercase;

@@ -1,5 +1,6 @@
 import type { AppId } from "../types";
 import { APP_LIST } from "../constants";
+import { lc } from "../utils/text";
 
 type BindingFilter = "all" | "custom" | "default";
 
@@ -36,13 +37,13 @@ export function FilterBar({
             <button
               key={app.id}
               onClick={() => onToggleApp(app.id)}
-              className={`px-2.5 py-1 text-[11px] tracking-wider border transition-colors ${
+              className={`px-2.5 py-1 text-xs tracking-wider border transition-colors ${
                 active
                   ? "border-accent/40 text-accent bg-accent-dim"
                   : "border-border text-text-muted hover:text-text-secondary hover:border-border-hover"
               }`}
             >
-              {app.name}
+              {lc(app.name)}
             </button>
           );
         })}
@@ -55,13 +56,13 @@ export function FilterBar({
             <button
               key={opt.value}
               onClick={() => onSetBindingFilter(opt.value)}
-              className={`px-2.5 py-1 text-[10px] tracking-wider transition-colors ${
+              className={`px-2.5 py-1 text-xs tracking-wider transition-colors ${
                 bindingFilter === opt.value
                   ? "bg-accent-dim text-accent"
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
-              {opt.label}
+              {lc(opt.label)}
             </button>
           ))}
         </div>
@@ -70,11 +71,11 @@ export function FilterBar({
           <select
             value={activeCategory || ""}
             onChange={(e) => onSetCategory(e.target.value || null)}
-            className="px-2.5 py-1 text-[10px] bg-bg-card border border-border text-text-muted focus:border-accent/30 focus:outline-none tracking-wider"
+            className="px-2.5 py-1 text-xs bg-bg-card border border-border text-text-muted focus:border-accent/30 focus:outline-none tracking-wider"
           >
-            <option value="">all categories</option>
+            <option value="">{lc("all categories")}</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>{lc(c)}</option>
             ))}
           </select>
         )}
@@ -82,9 +83,9 @@ export function FilterBar({
         {hasFilters && (
           <button
             onClick={onReset}
-            className="px-2.5 py-1 text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider"
+            className="px-2.5 py-1 text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
           >
-            clear
+            {lc("clear")}
           </button>
         )}
       </div>

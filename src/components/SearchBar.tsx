@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { lc } from "../utils/text";
 
 interface SearchBarProps {
   value: string;
@@ -31,7 +32,7 @@ export function SearchBar({ value, onChange, resultCount, totalCount }: SearchBa
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       <div className="relative group">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-text-muted group-focus-within:text-accent transition-colors">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-muted group-focus-within:text-accent transition-colors">
           &gt;
         </span>
         <input
@@ -39,19 +40,19 @@ export function SearchBar({ value, onChange, resultCount, totalCount }: SearchBa
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="grep bindings..."
-          className="w-full pl-8 pr-24 py-2.5 bg-bg-card border border-border text-text-primary text-xs placeholder:text-text-muted/50 focus:outline-none focus:border-accent/30 transition-colors"
+          placeholder={lc("grep bindings...")}
+          className="w-full pl-8 pr-24 py-2.5 bg-bg-card border border-border text-text-primary text-sm placeholder:text-text-muted/60 focus:outline-none focus:border-accent/30 transition-colors"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
           {value && (
             <button
               onClick={() => onChange("")}
-              className="text-[10px] text-text-muted hover:text-accent transition-colors"
+              className="text-xs text-text-muted hover:text-accent transition-colors"
             >
-              esc
+              {lc("esc")}
             </button>
           )}
-          <span className="text-[10px] text-text-muted tabular-nums">
+          <span className="text-xs text-text-muted tabular-nums">
             {resultCount}/{totalCount}
           </span>
         </div>

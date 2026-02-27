@@ -7,6 +7,7 @@ import { SearchBar } from "./components/SearchBar";
 import { FilterBar } from "./components/FilterBar";
 import { AppSection } from "./components/AppSection";
 import { LoadingState } from "./components/LoadingState";
+import { lc } from "./utils/text";
 import type { AppId } from "./types";
 import { APP_LIST } from "./constants";
 
@@ -63,17 +64,17 @@ export default function App() {
           <LoadingState />
         ) : error ? (
           <div className="text-center py-24">
-            <p className="text-xs text-text-secondary mb-2">[error] failed to fetch</p>
-            <p className="text-[10px] text-text-muted mb-4">{error}</p>
-            <button onClick={refresh} className="px-3 py-1.5 border border-accent/30 text-accent text-[10px] tracking-wider hover:bg-accent-dim transition-colors">
-              retry
+            <p className="text-sm text-text-secondary mb-2">{lc("[error] failed to fetch")}</p>
+            <p className="text-xs text-text-muted mb-4">{lc(error)}</p>
+            <button onClick={refresh} className="px-3 py-1.5 border border-accent/30 text-accent text-xs tracking-wider hover:bg-accent-dim transition-colors">
+              {lc("retry")}
             </button>
           </div>
         ) : results.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-xs text-text-muted tracking-wider">no matches found</p>
-            <button onClick={resetFilters} className="mt-3 text-[10px] text-accent hover:text-accent-light transition-colors tracking-wider">
-              clear filters
+            <p className="text-sm text-text-muted tracking-wider">{lc("no matches found")}</p>
+            <button onClick={resetFilters} className="mt-3 text-xs text-accent hover:text-accent-light transition-colors tracking-wider">
+              {lc("clear filters")}
             </button>
           </div>
         ) : (
@@ -86,12 +87,12 @@ export default function App() {
       </main>
 
       <footer className="border-t border-border py-6 text-center">
-        <p className="text-[10px] text-text-muted tracking-wider">
-          // live from{" "}
+        <p className="text-xs text-text-muted tracking-wider">
+          {lc("// live from")}{" "}
           <a href="https://github.com/MagnusPladsen/dotfiles" className="text-accent/40 hover:text-accent transition-colors" target="_blank" rel="noreferrer">
-            dotfiles
+            {lc("dotfiles")}
           </a>
-          {" "}· press <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-[9px] text-accent">/</kbd> to search
+          {" "}· {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
         </p>
       </footer>
     </div>

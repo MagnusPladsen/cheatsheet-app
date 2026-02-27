@@ -1,8 +1,10 @@
+import { lc } from "../utils/text";
+
 export function LoadingState() {
   return (
     <div className="flex items-center justify-center py-24 gap-1">
-      <span className="text-xs text-text-secondary">fetching from github</span>
-      <span className="cursor-blink text-accent text-xs">█</span>
+      <span className="text-sm text-text-secondary">{lc("fetching from github")}</span>
+      <span className="cursor-blink text-accent text-sm">█</span>
     </div>
   );
 }
