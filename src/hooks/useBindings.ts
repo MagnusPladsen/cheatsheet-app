@@ -4,6 +4,7 @@ import { APP_LIST } from "../constants";
 import { fetchAllFiles } from "../services/github";
 import { parsers, resetIdCounter } from "../parsers";
 import { clearCache } from "../services/cache";
+import { getDefaultBindings } from "../data/defaults";
 
 interface UseBindingsReturn {
   bindings: Binding[];
@@ -28,15 +29,17 @@ export function useBindings(): UseBindingsReturn {
 
     try {
       resetIdCounter();
-      const allBindings: Binding[] = [];
+      const customBindings: Binding[] = [];
 
       for (const app of APP_LIST) {
         const files = await fetchAllFiles(app.files);
         const parsed = parsers[app.id](files);
-        allBindings.push(...parsed);
+        customBindings.push(...parsed);
       }
 
-      setBindings(allBindings);
+      // Merge custom (fetched) + defaults
+      const defaults = getDefaultBindings();
+      setBindings([...customBindings, ...defaults]);
       setLastFetched(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch bindings");

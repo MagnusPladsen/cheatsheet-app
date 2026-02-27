@@ -1,5 +1,4 @@
 export type AppId =
-  | "vim"
   | "neovim"
   | "zed"
   | "aerospace"

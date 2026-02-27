@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { AnimatePresence } from "framer-motion";
 import { useBindings } from "./hooks/useBindings";
 import { useSearch } from "./hooks/useSearch";
 import { useTheme } from "./hooks/useTheme";
@@ -14,7 +13,7 @@ import { APP_LIST } from "./constants";
 export default function App() {
   const { bindings, loading, error, lastFetched, refresh } = useBindings();
   const {
-    results, filters, setSearch, toggleApp, setCustomOnly,
+    results, filters, setSearch, toggleApp, setBindingFilter,
     setCategory, resetFilters, categories, resultCount,
   } = useSearch(bindings);
   const { theme, toggle: toggleTheme } = useTheme();
@@ -50,8 +49,8 @@ export default function App() {
         <FilterBar
           activeApps={filters.apps}
           onToggleApp={toggleApp}
-          customOnly={filters.customOnly}
-          onToggleCustom={setCustomOnly}
+          bindingFilter={filters.bindingFilter}
+          onSetBindingFilter={setBindingFilter}
           activeCategory={filters.category}
           categories={categories}
           onSetCategory={setCategory}
@@ -77,11 +76,9 @@ export default function App() {
           </div>
         ) : (
           <div className="space-y-10">
-            <AnimatePresence mode="popLayout">
-              {[...groupedByApp.entries()].map(([appId, appBindings]) => (
-                <AppSection key={appId} appId={appId} bindings={appBindings} />
-              ))}
-            </AnimatePresence>
+            {[...groupedByApp.entries()].map(([appId, appBindings]) => (
+              <AppSection key={appId} appId={appId} bindings={appBindings} />
+            ))}
           </div>
         )}
       </main>

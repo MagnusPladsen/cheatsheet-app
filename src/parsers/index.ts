@@ -1,5 +1,4 @@
 import type { AppId, Binding } from "../types";
-import { parseVim } from "./vim";
 import { parseNeovim } from "./neovim";
 import { parseZed } from "./zed";
 import { parseAerospace } from "./aerospace";
@@ -11,7 +10,6 @@ import { parseEspanso } from "./espanso";
 export type Parser = (files: Map<string, string>) => Binding[];
 
 export const parsers: Record<AppId, Parser> = {
-  vim: parseVim,
   neovim: parseNeovim,
   zed: parseZed,
   aerospace: parseAerospace,

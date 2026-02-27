@@ -19,14 +19,8 @@ export const APPS: Record<AppId, AppConfig> = {
       dotfile(".config/nvim/lua/plugins/astrolsp.lua"),
       dotfile(".config/nvim/lua/mappings.lua"),
       dotfile(".config/nvim/init.lua"),
+      dotfile(".vimrc"),
     ],
-  },
-  vim: {
-    id: "vim",
-    name: "Vim",
-    icon: "📝",
-    color: "text-emerald-400",
-    files: [dotfile(".vimrc")],
   },
   zed: {
     id: "zed",

@@ -6,6 +6,10 @@ export function parseTmux(files: Map<string, string>): Binding[] {
   const content = files.get(".tmux.conf");
   if (!content) return bindings;
 
+  // Detect custom prefix, default is Ctrl+B
+  const prefixMatch = content.match(/set\s+-g\s+prefix\s+(\S+)/);
+  const prefix = prefixMatch ? formatTmuxKey(prefixMatch[1]) : "Ctrl+B";
+
   const lines = content.split("\n");
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -22,7 +26,7 @@ export function parseTmux(files: Map<string, string>): Binding[] {
       bindings.push({
         id: makeId("tmux"),
         app: "tmux",
-        key: `prefix + ${key}`,
+        key: `${prefix}, ${formatTmuxKey(key)}`,
         action: displayMatch?.[1] || comment || action,
         category: categorizeTmux(action),
         isCustom: true,
@@ -32,6 +36,15 @@ export function parseTmux(files: Map<string, string>): Binding[] {
   }
 
   return bindings;
+}
+
+function formatTmuxKey(key: string): string {
+  return key
+    .replace(/C-/g, "Ctrl+")
+    .replace(/M-/g, "Alt+")
+    .toUpperCase()
+    .replace(/CTRL/g, "Ctrl")
+    .replace(/ALT/g, "Alt");
 }
 
 function categorizeTmux(action: string): string {

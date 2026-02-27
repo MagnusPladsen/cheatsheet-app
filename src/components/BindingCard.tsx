@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import type { Binding } from "../types";
 import { KbdBadge } from "./KbdBadge";
 
@@ -8,13 +7,7 @@ interface BindingCardProps {
 
 export function BindingCard({ binding }: BindingCardProps) {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="group flex items-start gap-3 p-3 rounded-lg bg-bg-card border border-border hover:border-accent/30 hover:bg-bg-card-hover transition-all"
-    >
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-bg-card border border-border hover:border-accent/30 hover:bg-bg-card-hover transition-colors duration-150">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <KbdBadge keys={binding.key} />
@@ -23,9 +16,13 @@ export function BindingCard({ binding }: BindingCardProps) {
               {binding.mode}
             </span>
           )}
-          {binding.isCustom && (
+          {binding.isCustom ? (
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-badge-custom/20 text-accent-light font-medium">
               custom
+            </span>
+          ) : (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-badge-default/40 text-text-muted font-medium">
+              default
             </span>
           )}
         </div>
@@ -36,6 +33,6 @@ export function BindingCard({ binding }: BindingCardProps) {
           {binding.category}
         </span>
       )}
-    </motion.div>
+    </div>
   );
 }
