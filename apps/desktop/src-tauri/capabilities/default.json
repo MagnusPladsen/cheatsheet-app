@@ -9,7 +9,9 @@
     "dialog:allow-open",
     "fs:default",
     "fs:allow-read-text-file",
+    "fs:allow-write-file",
     "fs:allow-exists",
+    "fs:allow-watch",
     {
       "identifier": "fs:scope",
       "allow": [
@@ -17,6 +19,14 @@
         { "path": "$CONFIG/**" },
         { "path": "$APPDATA/**" }
       ]
-    }
+    },
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-is-visible",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-decorations"
   ]
 }

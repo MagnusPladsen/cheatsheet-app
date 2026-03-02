@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
 @source "../../../packages/shared/src";
 
-/* cozette vector — self-hosted */
+/* cozette vector — self-hosted (display/branding only) */
 @font-face {
   font-family: "Cozette";
   src: url("/fonts/CozetteVector.woff2") format("woff2"),
@@ -22,8 +23,8 @@
 
 @theme {
   --font-display: "Cozette", monospace;
-  --font-body: "Cozette", monospace;
-  --font-mono: "Cozette", monospace;
+  --font-body: "JetBrains Mono", monospace;
+  --font-mono: "JetBrains Mono", monospace;
 
   --color-bg-primary: #0a0a0a;
   --color-bg-secondary: #121212;

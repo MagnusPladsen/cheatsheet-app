@@ -2,16 +2,26 @@ import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import {
   useSearch,
   useTheme,
+  useConflicts,
   Header,
   SearchBar,
   FilterBar,
   AppSection,
+  ConflictPanel,
+  ExportButton,
+  PracticeMode,
   LoadingState,
   lc,
   APP_LIST,
 } from "@cheatsheet/shared";
-import type { AppId } from "@cheatsheet/shared";
+import type { AppId, SearchResult } from "@cheatsheet/shared";
 import { useBindings } from "./hooks/useBindings.ts";
+import { useWindowManager } from "./hooks/useWindowManager.ts";
+import { useGlobalShortcut } from "./hooks/useGlobalShortcut.ts";
+import { useTray } from "./hooks/useTray.ts";
+import { useFileWatcher } from "./hooks/useFileWatcher.ts";
+import { save } from "@tauri-apps/plugin-dialog";
+import { writeFile } from "@tauri-apps/plugin-fs";
 import { FolderPicker } from "./components/FolderPicker.tsx";
 
 export default function App() {
@@ -21,8 +31,28 @@ export default function App() {
     setCategory, resetFilters, categories, resultCount,
   } = useSearch(bindings);
   const { theme, themes, setTheme } = useTheme();
+  const { conflicts, conflictCount, showConflicts, toggleConflicts } = useConflicts(bindings);
+
+  const { toggleOverlay, showNormal, hide } = useWindowManager();
+  useGlobalShortcut("CommandOrControl+Shift+K", toggleOverlay);
+  useTray({ onShow: showNormal, onHide: hide, onToggle: toggleOverlay });
+  useFileWatcher(folders, refresh);
 
   const [showSettings, setShowSettings] = useState(false);
+  const [showPractice, setShowPractice] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleSaveFile = useCallback(async (data: Uint8Array, defaultName: string) => {
+    const path = await save({
+      defaultPath: defaultName,
+      filters: defaultName.endsWith(".png")
+        ? [{ name: "PNG Image", extensions: ["png"] }]
+        : [{ name: "PDF Document", extensions: ["pdf"] }],
+    });
+    if (path) {
+      await writeFile(path, data);
+    }
+  }, []);
 
   const mainSearchRef = useRef<HTMLInputElement>(null);
   const compactSearchRef = useRef<HTMLInputElement>(null);
@@ -70,10 +100,10 @@ export default function App() {
   }, [searchOutOfView, stableSetSearch, showSettings]);
 
   const groupedByApp = useMemo(() => {
-    const map = new Map<AppId, typeof results>();
+    const map = new Map<AppId, SearchResult[]>();
     for (const app of APP_LIST) {
-      const appBindings = results.filter((b) => b.app === app.id);
-      if (appBindings.length > 0) map.set(app.id, appBindings);
+      const appResults = results.filter((r) => r.binding.app === app.id);
+      if (appResults.length > 0) map.set(app.id, appResults);
     }
     return map;
   }, [results]);
@@ -140,6 +170,31 @@ export default function App() {
           onReset={resetFilters}
         />
 
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => setShowPractice(true)}
+            className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
+          >
+            {lc("practice")}
+          </button>
+          <ExportButton contentRef={contentRef} onSaveFile={handleSaveFile} />
+          {conflictCount > 0 && (
+            <button
+              onClick={toggleConflicts}
+              className={`text-xs tracking-wider transition-colors ${
+                showConflicts
+                  ? "text-amber-400"
+                  : "text-text-muted hover:text-amber-400"
+              }`}
+            >
+              {showConflicts ? lc("hide conflicts") : lc("conflicts")}{" "}
+              <span className="text-amber-400/60">[{conflictCount}]</span>
+            </button>
+          )}
+        </div>
+
+        {showConflicts && <ConflictPanel conflicts={conflicts} />}
+
         {loading && bindings.length === 0 ? (
           <LoadingState />
         ) : error ? (
@@ -158,13 +213,21 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <div className="space-y-8">
-            {entries.map(([appId, appBindings], i) => (
-              <AppSection key={appId} appId={appId} bindings={appBindings} index={i} />
+          <div ref={contentRef} className="space-y-8">
+            {entries.map(([appId, appResults], i) => (
+              <AppSection key={appId} appId={appId} results={appResults} index={i} />
             ))}
           </div>
         )}
       </main>
+
+      {showPractice && (
+        <PracticeMode
+          bindings={bindings}
+          categories={categories}
+          onClose={() => setShowPractice(false)}
+        />
+      )}
 
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-text-muted tracking-wider">

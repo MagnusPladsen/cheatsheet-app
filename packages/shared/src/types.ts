@@ -30,3 +30,13 @@ export interface CacheEntry<T> {
   data: T;
   timestamp: number;
 }
+
+export interface MatchInfo {
+  key: string;
+  indices: readonly [number, number][];
+}
+
+export interface SearchResult {
+  binding: Binding;
+  matches?: MatchInfo[];
+}

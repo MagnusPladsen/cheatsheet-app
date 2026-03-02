@@ -2,24 +2,42 @@ import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import {
   useSearch,
   useTheme,
+  useConflicts,
   Header,
   SearchBar,
   FilterBar,
   AppSection,
+  ConflictPanel,
+  ExportButton,
+  PracticeMode,
+  ShareButton,
   LoadingState,
   lc,
   APP_LIST,
+  getShareHash,
+  decodeBindings,
 } from "@cheatsheet/shared";
-import type { AppId } from "@cheatsheet/shared";
+import type { AppId, SearchResult, Binding } from "@cheatsheet/shared";
 import { useBindings } from "./hooks/useBindings.ts";
 
 export default function App() {
-  const { bindings, loading, error, lastFetched, refresh } = useBindings();
+  const { bindings: fetchedBindings, loading, error, lastFetched, refresh } = useBindings();
+
+  // Check for shared bindings from URL hash
+  const [sharedBindings] = useState<Binding[] | null>(() => {
+    const hash = getShareHash();
+    return hash ? decodeBindings(hash) : null;
+  });
+  const isSharedView = sharedBindings !== null;
+  const bindings = isSharedView ? sharedBindings : fetchedBindings;
   const {
     results, filters, setSearch, toggleApp, setBindingFilter,
     setCategory, resetFilters, categories, resultCount,
   } = useSearch(bindings);
   const { theme, themes, setTheme } = useTheme();
+  const { conflicts, conflictCount, showConflicts, toggleConflicts } = useConflicts(bindings);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [showPractice, setShowPractice] = useState(false);
 
   const mainSearchRef = useRef<HTMLInputElement>(null);
   const compactSearchRef = useRef<HTMLInputElement>(null);
@@ -63,10 +81,10 @@ export default function App() {
   }, [searchOutOfView, stableSetSearch]);
 
   const groupedByApp = useMemo(() => {
-    const map = new Map<AppId, typeof results>();
+    const map = new Map<AppId, SearchResult[]>();
     for (const app of APP_LIST) {
-      const appBindings = results.filter((b) => b.app === app.id);
-      if (appBindings.length > 0) map.set(app.id, appBindings);
+      const appResults = results.filter((r) => r.binding.app === app.id);
+      if (appResults.length > 0) map.set(app.id, appResults);
     }
     return map;
   }, [results]);
@@ -94,6 +112,20 @@ export default function App() {
       />
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+        {isSharedView && (
+          <div className="border border-accent/30 bg-accent-dim px-4 py-3 flex items-center justify-between">
+            <p className="text-xs text-accent tracking-wider">
+              {lc("// viewing shared bindings")} [{bindings.length}]
+            </p>
+            <a
+              href={window.location.pathname}
+              className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
+            >
+              {lc("view your own")} →
+            </a>
+          </div>
+        )}
+
         <div ref={searchSentinelRef}>
           <SearchBar
             value={filters.search}
@@ -115,6 +147,39 @@ export default function App() {
           onReset={resetFilters}
         />
 
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => setShowPractice(true)}
+            className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
+          >
+            {lc("practice")}
+          </button>
+          <ExportButton contentRef={contentRef} />
+          {!isSharedView && (
+            <ShareButton
+              bindings={bindings}
+              categories={categories}
+              filteredBindings={results.map((r) => r.binding)}
+              activeCategory={filters.category}
+            />
+          )}
+          {conflictCount > 0 && (
+            <button
+              onClick={toggleConflicts}
+              className={`text-xs tracking-wider transition-colors ${
+                showConflicts
+                  ? "text-amber-400"
+                  : "text-text-muted hover:text-amber-400"
+              }`}
+            >
+              {showConflicts ? lc("hide conflicts") : lc("conflicts")}{" "}
+              <span className="text-amber-400/60">[{conflictCount}]</span>
+            </button>
+          )}
+        </div>
+
+        {showConflicts && <ConflictPanel conflicts={conflicts} />}
+
         {loading && bindings.length === 0 ? (
           <LoadingState />
         ) : error ? (
@@ -133,13 +198,21 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <div className="space-y-8">
-            {entries.map(([appId, appBindings], i) => (
-              <AppSection key={appId} appId={appId} bindings={appBindings} index={i} />
+          <div ref={contentRef} className="space-y-8">
+            {entries.map(([appId, appResults], i) => (
+              <AppSection key={appId} appId={appId} results={appResults} index={i} />
             ))}
           </div>
         )}
       </main>
+
+      {showPractice && (
+        <PracticeMode
+          bindings={bindings}
+          categories={categories}
+          onClose={() => setShowPractice(false)}
+        />
+      )}
 
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-text-muted tracking-wider">

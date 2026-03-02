@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import Fuse from "fuse.js";
-import type { AppId, Binding } from "../types";
+import type { AppId, Binding, SearchResult, MatchInfo } from "../types";
 
 export type BindingFilter = "all" | "custom" | "default";
 
@@ -12,7 +12,7 @@ interface Filters {
 }
 
 interface UseSearchReturn {
-  results: Binding[];
+  results: SearchResult[];
   filters: Filters;
   setSearch: (q: string) => void;
   toggleApp: (app: AppId) => void;
@@ -48,29 +48,38 @@ export function useSearch(bindings: Binding[]): UseSearchReturn {
         findAllMatches: true,
         minMatchCharLength: 2,
         useExtendedSearch: true,
+        includeMatches: true,
       }),
     [bindings]
   );
 
   const results = useMemo(() => {
-    let filtered = bindings;
+    let filtered: SearchResult[];
 
     if (filters.search.trim()) {
-      filtered = fuse.search(filters.search).map((r) => r.item);
+      filtered = fuse.search(filters.search).map((r) => ({
+        binding: r.item,
+        matches: r.matches?.map((m) => ({
+          key: m.key ?? "",
+          indices: m.indices as [number, number][],
+        })) as MatchInfo[] | undefined,
+      }));
+    } else {
+      filtered = bindings.map((b) => ({ binding: b }));
     }
 
     if (filters.apps.length > 0) {
-      filtered = filtered.filter((b) => filters.apps.includes(b.app));
+      filtered = filtered.filter((r) => filters.apps.includes(r.binding.app));
     }
 
     if (filters.bindingFilter === "custom") {
-      filtered = filtered.filter((b) => b.isCustom);
+      filtered = filtered.filter((r) => r.binding.isCustom);
     } else if (filters.bindingFilter === "default") {
-      filtered = filtered.filter((b) => !b.isCustom);
+      filtered = filtered.filter((r) => !r.binding.isCustom);
     }
 
     if (filters.category) {
-      filtered = filtered.filter((b) => b.category === filters.category);
+      filtered = filtered.filter((r) => r.binding.category === filters.category);
     }
 
     return filtered;

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+
 #[derive(Debug, Serialize, Deserialize)]
 struct StoredConfig {
     folders: Vec<String>,
@@ -84,6 +85,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             read_config_files,
             get_stored_folders,
@@ -91,6 +93,12 @@ pub fn run() {
             detect_apps,
             get_home_dir,
         ])
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                window.hide().ok();
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
