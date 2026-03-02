@@ -147,7 +147,7 @@ export default function App() {
           onReset={resetFilters}
         />
 
-        <div className="flex justify-end gap-3">
+        <div className="flex items-center justify-end gap-3">
           <button
             onClick={() => setShowPractice(true)}
             className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"

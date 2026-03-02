@@ -30,6 +30,8 @@ export type { BindingFilter } from "./hooks/useSearch.ts";
 export { useTheme } from "./hooks/useTheme.ts";
 export { useConflicts } from "./hooks/useConflicts.ts";
 export { usePractice } from "./hooks/usePractice.ts";
+export type { StepResult, CardTiming, UsePracticeReturn } from "./hooks/usePractice.ts";
+
 
 // Components
 export { Header } from "./components/Header.tsx";
@@ -48,3 +50,10 @@ export { PracticeMode } from "./components/PracticeMode.tsx";
 export { ShareButton } from "./components/ShareButton.tsx";
 export { encodeBindings, decodeBindings, getShareHash, buildShareUrl } from "./utils/shareUrl.ts";
 export { exportToPng, exportToPdf } from "./utils/exportUtils.ts";
+
+// Practice utils
+export { parseBindingSteps, normalizeStep } from "./utils/keyCapture.ts";
+export { calculateScore, getStreakMessage, generateDailySeed, seededShuffle } from "./utils/practiceScoring.ts";
+export type { GameMode, ScoreResult } from "./utils/practiceScoring.ts";
+export { loadScores, saveRun, getHighscore, getDailyResult } from "./utils/practiceStorage.ts";
+export type { RunResult, PracticeStore } from "./utils/practiceStorage.ts";

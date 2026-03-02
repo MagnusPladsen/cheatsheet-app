@@ -119,6 +119,48 @@ body {
   color: inherit;
 }
 
+/* practice mode animations */
+@keyframes correctPulse {
+  0% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.practice-correct-pulse {
+  animation: correctPulse 0.2s ease-out;
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.practice-wrong-shake {
+  animation: wrongShake 0.3s ease-out;
+}
+
+@keyframes scorePop {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-30px); }
+}
+.practice-score-pop {
+  animation: scorePop 0.8s ease-out forwards;
+}
+
+@keyframes streakFade {
+  0% { opacity: 0; transform: translateY(4px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.practice-streak-fade {
+  animation: streakFade 2s ease-out forwards;
+}
+
+.practice-streak-glow {
+  text-shadow: 0 0 8px var(--color-accent);
+}
+
 /* scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
