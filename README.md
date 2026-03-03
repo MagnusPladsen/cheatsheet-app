@@ -1,5 +1,9 @@
 # cheatsheet
 
+[![Release](https://github.com/MagnusPladsen/my-cheatsheet/actions/workflows/release.yml/badge.svg)](https://github.com/MagnusPladsen/my-cheatsheet/actions/workflows/release.yml)
+[![Vercel](https://img.shields.io/github/deployments/MagnusPladsen/my-cheatsheet/production?label=vercel&logo=vercel)](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app)
+[![Latest Release](https://img.shields.io/github/v/release/MagnusPladsen/my-cheatsheet?label=latest)](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest)
+
 Developer keybinding cheatsheet for neovim, tmux, aerospace, kitty, zed, zsh, and espanso. Parses your actual config files and displays all your bindings in a searchable UI.
 
 Available as a [web app](https://github.com/MagnusPladsen/my-cheatsheet) and a native desktop app (Tauri).
