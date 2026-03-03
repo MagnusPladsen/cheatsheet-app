@@ -5,13 +5,12 @@ import { APPS } from "../constants";
 import { KbdBadge } from "./KbdBadge";
 import { captureKeyCombo } from "../utils/keyCapture";
 import { usePractice } from "../hooks/usePractice";
-import type { CardTiming } from "../hooks/usePractice";
+
 import { lc } from "../utils/text";
 import { getDailyResult } from "../utils/practiceStorage";
 
 interface PracticeModeProps {
   bindings: Binding[];
-  categories: string[];
   onClose: () => void;
 }
 
@@ -46,7 +45,7 @@ function isPracticable(b: Binding): boolean {
   return true;
 }
 
-export function PracticeMode({ bindings, categories, onClose }: PracticeModeProps) {
+export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
   const [screen, setScreen] = useState<Screen>("mode");
   const [selectedMode, setSelectedMode] = useState<GameMode>("classic");
   const [inputDisplay, setInputDisplay] = useState("");
@@ -58,10 +57,10 @@ export function PracticeMode({ bindings, categories, onClose }: PracticeModeProp
 
   const practice = usePractice();
   const {
-    active, mode, current, steps, stepIndex, score, streak, bestStreak,
-    total, correct, lives, lastResult, lastPoints, streakMessage, finished,
+    active, mode, current, steps, stepIndex, score, streak,
+    total, lives, lastResult, lastPoints, streakMessage, finished,
     timeRemaining, questionIndex, cardTimings, runResult, store,
-    isNewHighscore, dailyAlreadyPlayed,
+    isNewHighscore,
     start, check, skip, stop, tick,
   } = practice;
 

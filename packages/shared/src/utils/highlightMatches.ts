@@ -1,5 +1,3 @@
-import type Fuse from "fuse.js";
-
 export interface TextChunk {
   text: string;
   highlight: boolean;
@@ -7,7 +5,7 @@ export interface TextChunk {
 
 export function highlightFromMatches(
   text: string,
-  matchIndices: readonly Fuse.RangeTuple[] | undefined,
+  matchIndices: readonly [number, number][] | undefined,
 ): TextChunk[] {
   if (!matchIndices || matchIndices.length === 0) {
     return [{ text, highlight: false }];

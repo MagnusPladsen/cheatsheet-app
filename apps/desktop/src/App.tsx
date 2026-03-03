@@ -224,7 +224,6 @@ export default function App() {
       {showPractice && (
         <PracticeMode
           bindings={bindings}
-          categories={categories}
           onClose={() => setShowPractice(false)}
         />
       )}

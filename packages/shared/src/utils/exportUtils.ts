@@ -37,8 +37,8 @@ export async function exportToPdf(element: HTMLElement): Promise<Uint8Array> {
 }
 
 // Web fallback: download via blob link
-export function downloadBytes(data: Uint8Array, filename: string, mime: string) {
-  const blob = new Blob([data], { type: mime });
+export function downloadBytes(data: Uint8Array | ArrayBuffer, filename: string, mime: string) {
+  const blob = new Blob([data as BlobPart], { type: mime });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;

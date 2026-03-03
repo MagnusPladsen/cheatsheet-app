@@ -13,8 +13,6 @@ const modifierAliases: Record<string, string> = {
   shift: "shift",
 };
 
-const knownModifiers = new Set(Object.values(modifierAliases));
-
 export function normalizeKey(key: string): string {
   const parts = key
     .toLowerCase()

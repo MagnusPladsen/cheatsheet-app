@@ -158,7 +158,6 @@ export default function App() {
           {!isSharedView && (
             <ShareButton
               bindings={bindings}
-              categories={categories}
               filteredBindings={results.map((r) => r.binding)}
               activeCategory={filters.category}
             />
@@ -209,7 +208,6 @@ export default function App() {
       {showPractice && (
         <PracticeMode
           bindings={bindings}
-          categories={categories}
           onClose={() => setShowPractice(false)}
         />
       )}

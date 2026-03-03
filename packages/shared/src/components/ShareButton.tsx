@@ -5,12 +5,11 @@ import { lc } from "../utils/text";
 
 interface ShareButtonProps {
   bindings: Binding[];
-  categories: string[];
   filteredBindings: Binding[];
   activeCategory: string | null;
 }
 
-export function ShareButton({ bindings, categories, filteredBindings, activeCategory }: ShareButtonProps) {
+export function ShareButton({ bindings, filteredBindings, activeCategory }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
