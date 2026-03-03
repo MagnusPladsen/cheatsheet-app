@@ -24,7 +24,21 @@ export function captureKeyCombo(e: KeyboardEvent): string {
   if (e.ctrlKey) parts.push("Ctrl");
   if (e.metaKey) parts.push("Cmd");
   if (e.altKey) parts.push("Alt");
-  if (e.shiftKey) parts.push("Shift");
+
+  // Only include Shift as an explicit modifier when intentional:
+  // - With another modifier held (Ctrl+Shift+K)
+  // - With a letter key (Shift+V for vim visual line)
+  // - With a special key (Shift+Tab, Shift+Enter)
+  // Don't include Shift when it's just producing a character (Shift+' → ", Shift+5 → %)
+  if (e.shiftKey) {
+    const hasOtherModifier = e.ctrlKey || e.metaKey || e.altKey;
+    const keyVal = e.key;
+    const isLetter = keyVal.length === 1 && /[a-zA-Z]/.test(keyVal);
+    const isSpecial = keyVal.length > 1;
+    if (hasOtherModifier || isLetter || isSpecial) {
+      parts.push("Shift");
+    }
+  }
 
   const key = e.key;
 

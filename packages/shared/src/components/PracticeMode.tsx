@@ -33,6 +33,10 @@ const PLACEHOLDER_PATTERN = /\b(0-9|arrow|n\b)/i;
 function isPracticable(b: Binding): boolean {
   if (!b.key || !b.action) return false;
   if (VIM_RAW_PATTERN.test(b.key)) return false;
+  // Filter out bindings where the action is raw vim notation, not a description
+  if (VIM_RAW_PATTERN.test(b.action) || /^<[^>]+>/.test(b.action)) return false;
+  // Filter out disabled bindings
+  if (b.action.startsWith("(disabled")) return false;
   // Zsh aliases are typed commands, not key combos
   if (b.app === "zsh" && !b.key.includes("+")) return false;
   // Filter out placeholder/range keys like "0-9", "Arrow", "N"
@@ -62,6 +66,8 @@ export function PracticeMode({ bindings, categories, onClose }: PracticeModeProp
   } = practice;
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pressedKeysRef = useRef(new Set<string>());
+  const allReleasedRef = useRef(true);
 
   // Practicable bindings (filtered once)
   const practicable = useMemo(() => bindings.filter(isPracticable), [bindings]);
@@ -94,6 +100,30 @@ export function PracticeMode({ bindings, categories, onClose }: PracticeModeProp
     }
     return [...cats].sort();
   }, [practicable]);
+
+  // Track keyup for multi-step sequences — require all keys released between steps
+  useEffect(() => {
+    if (screen !== "play" || !active || finished) return;
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      pressedKeysRef.current.delete(e.code);
+      if (pressedKeysRef.current.size === 0) {
+        allReleasedRef.current = true;
+      }
+    };
+
+    const handleBlur = () => {
+      pressedKeysRef.current.clear();
+      allReleasedRef.current = true;
+    };
+
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
+    return () => {
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, [screen, active, finished]);
 
   // Speed round timer
   useEffect(() => {
@@ -149,10 +179,22 @@ export function PracticeMode({ bindings, categories, onClose }: PracticeModeProp
       e.preventDefault();
       e.stopPropagation();
 
+      // Ignore held-key autorepeat
+      if (e.repeat) return;
+
+      // Track physically pressed keys
+      pressedKeysRef.current.add(e.code);
+
       const combo = captureKeyCombo(e);
       if (!combo || combo === "Shift" || combo === "Ctrl" || combo === "Alt" || combo === "Cmd") {
         return;
       }
+
+      // For multi-step sequences, require all keys released from previous step
+      if (stepIndex > 0 && !allReleasedRef.current) {
+        return;
+      }
+      allReleasedRef.current = false;
 
       setInputDisplay(combo);
 
@@ -187,12 +229,14 @@ export function PracticeMode({ bindings, categories, onClose }: PracticeModeProp
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [screen, active, current, finished, check, skip, mode, lastPoints]);
+  }, [screen, active, current, finished, check, skip, mode, lastPoints, stepIndex]);
 
-  // Reset input display on new question
+  // Reset input display and key tracking on new question
   useEffect(() => {
     setInputDisplay("");
     setAttempts(0);
+    pressedKeysRef.current.clear();
+    allReleasedRef.current = true;
   }, [current?.id]);
 
   // Trigger streak message fade
