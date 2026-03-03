@@ -72,8 +72,6 @@ jobs:
   update-homebrew:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Get version from tag
