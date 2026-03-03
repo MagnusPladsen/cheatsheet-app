@@ -80,29 +80,37 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for release assets
+      - name: Download macOS DMGs from draft release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          mkdir -p artifacts
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Find the draft release (tauri-action creates drafts)
           for i in $(seq 1 30); do
-            count=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} \
-              --jq '.assets | length' 2>/dev/null || echo 0)
-            if [ "$count" -ge 3 ]; then
-              echo "Release assets ready ($count assets)"
-              break
+            RELEASE=$(gh api repos/${{ github.repository }}/releases \
+              --jq ".[] | select(.tag_name == \"${{ github.ref_name }}\")" 2>/dev/null || echo "")
+            if [ -n "$RELEASE" ]; then
+              DMG_COUNT=$(echo "$RELEASE" | jq '[.assets[] | select(.name | endswith(".dmg"))] | length')
+              if [ "$DMG_COUNT" -ge 2 ]; then
+                echo "Found release with $DMG_COUNT DMG assets"
+                break
+              fi
             fi
-            echo "Waiting for release assets... ($count so far)"
+            echo "Waiting for release assets... (attempt $i)"
             sleep 10
           done
 
-      - name: Download macOS DMGs
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download ${{ github.ref_name }} \
-            --repo ${{ github.repository }} \
-            --pattern "*.dmg" \
-            --dir artifacts
+          # Download DMGs via API
+          echo "$RELEASE" | jq -r '.assets[] | select(.name | endswith(".dmg")) | .url' | while read url; do
+            FILENAME=$(echo "$RELEASE" | jq -r ".assets[] | select(.url == \"$url\") | .name")
+            echo "Downloading $FILENAME..."
+            curl -sL -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/octet-stream" \
+              "$url" -o "artifacts/$FILENAME"
+          done
+          ls -la artifacts/
 
       - name: Compute SHA256 checksums
         id: sha

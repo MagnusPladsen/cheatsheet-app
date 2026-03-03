@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicoulaj/tauri/refs/heads/dev/crates/tauri-schema-generator/schemas/config.schema.json",
   "productName": "cheatsheet",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "identifier": "com.magnuspladsen.cheatsheet",
   "build": {
     "frontendDist": "../dist",
