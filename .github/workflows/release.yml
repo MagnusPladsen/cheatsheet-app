@@ -119,7 +119,10 @@ jobs:
             sha256sum "$f"
           done
           ARM64_SHA=$(sha256sum *aarch64*.dmg | awk '{print $1}')
-          X64_SHA=$(sha256sum *x64*.dmg 2>/dev/null || sha256sum *x86_64*.dmg 2>/dev/null | awk '{print $1}')
+          X64_SHA=$(sha256sum *x64*.dmg 2>/dev/null | awk '{print $1}')
+          if [ -z "$X64_SHA" ]; then
+            X64_SHA=$(sha256sum *x86_64*.dmg | awk '{print $1}')
+          fi
           echo "arm64=$ARM64_SHA" >> "$GITHUB_OUTPUT"
           echo "x64=$X64_SHA" >> "$GITHUB_OUTPUT"
 
