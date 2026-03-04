@@ -1,4 +1,4 @@
-pkgbase = cheatsheet-bin
+pkgbase = cheatsheet-app-bin
 	pkgdesc = Developer keybinding cheatsheet for neovim, tmux, aerospace, and more
 	pkgver = 1.0.5
 	pkgrel = 1
@@ -19,4 +19,4 @@ pkgbase = cheatsheet-bin
 	source_x86_64 = https://github.com/MagnusPladsen/my-cheatsheet/releases/download/v1.0.5/cheatsheet_1.0.5_amd64.deb
 	sha256sums_x86_64 = d6dae3a06e0678c24d2b815f143148e9e8e4c57ee696e7947b4082f663acbc9e
 
-pkgname = cheatsheet-bin
+pkgname = cheatsheet-app-bin

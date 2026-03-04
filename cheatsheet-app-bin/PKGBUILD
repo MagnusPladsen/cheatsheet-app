@@ -1,5 +1,5 @@
 # Maintainer: Magnus Pladsen <magnuspladsen@users.noreply.github.com>
-pkgname=cheatsheet-bin
+pkgname=cheatsheet-app-bin
 pkgver=1.0.5
 pkgrel=1
 pkgdesc="Developer keybinding cheatsheet for neovim, tmux, aerospace, and more"

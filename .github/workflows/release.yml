@@ -249,10 +249,10 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           DEB_SHA="${{ steps.sha.outputs.deb }}"
 
-          git clone ssh://aur@aur.archlinux.org/cheatsheet-bin.git aur-repo
+          git clone ssh://aur@aur.archlinux.org/cheatsheet-app-bin.git aur-repo
 
           # Copy PKGBUILD template from repo and update version + sha
-          cp cheatsheet-bin/PKGBUILD aur-repo/PKGBUILD
+          cp cheatsheet-app-bin/PKGBUILD aur-repo/PKGBUILD
           cd aur-repo
           sed -i "s/^pkgver=.*/pkgver=${VERSION}/" PKGBUILD
           sed -i "s/^sha256sums_x86_64=.*/sha256sums_x86_64=('${DEB_SHA}')/" PKGBUILD
