@@ -164,24 +164,62 @@ function findDescInBlock(lines: string[], startIdx: number): string | null {
   return null;
 }
 
-// Parse vim.keymap.set() calls
+// Parse vim.keymap.set() calls and local aliases (e.g. local map = vim.keymap.set)
 function parseVimKeymapSet(content: string): Binding[] {
   const bindings: Binding[] = [];
-  const regex = /vim\.keymap\.set\(\s*"([^"]+)"\s*,\s*"([^"]+)"[^{]*\{\s*desc\s*=\s*"([^"]+)"/g;
+
+  // Detect aliases: local map = vim.keymap.set
+  const funcNames = ["vim\\.keymap\\.set"];
+  const aliasRegex = /local\s+(\w+)\s*=\s*vim\.keymap\.set/g;
+  let aliasMatch;
+  while ((aliasMatch = aliasRegex.exec(content))) {
+    funcNames.push(aliasMatch[1]);
+  }
+
+  const caller = `(?:${funcNames.join("|")})`;
+  const modeMap: Record<string, string> = { n: "normal", i: "insert", v: "visual", x: "visual", t: "terminal" };
+
+  // Pattern 1: single mode string — map("n", "<key>", ..., { desc = "..." })
+  const singleMode = new RegExp(
+    `${caller}\\(\\s*"([^"]+)"\\s*,\\s*"([^"]+)"[\\s\\S]*?\\{\\s*desc\\s*=\\s*"([^"]+)"`,
+    "g",
+  );
   let match;
-  while ((match = regex.exec(content))) {
-    const modeMap: Record<string, string> = { n: "normal", i: "insert", v: "visual" };
+  while ((match = singleMode.exec(content))) {
     bindings.push({
       id: makeId("neovim"),
       app: "neovim",
       key: formatKey(match[2]),
       action: match[3],
       mode: modeMap[match[1]] || match[1],
-      category: "General",
+      category: categorize(match[2], match[3], "init.lua"),
       isCustom: true,
       raw: match[0],
     });
   }
+
+  // Pattern 2: multi mode table — map({ "n", "v" }, "<key>", ..., { desc = "..." })
+  const multiMode = new RegExp(
+    `${caller}\\(\\s*\\{([^}]+)\\}\\s*,\\s*"([^"]+)"[\\s\\S]*?\\{\\s*desc\\s*=\\s*"([^"]+)"`,
+    "g",
+  );
+  while ((match = multiMode.exec(content))) {
+    const modes = match[1].split(",").map((m) => m.trim().replace(/"/g, ""));
+    for (const mode of modes) {
+      if (!mode) continue;
+      bindings.push({
+        id: makeId("neovim"),
+        app: "neovim",
+        key: formatKey(match[2]),
+        action: match[3],
+        mode: modeMap[mode] || mode,
+        category: categorize(match[2], match[3], "init.lua"),
+        isCustom: true,
+        raw: match[0],
+      });
+    }
+  }
+
   return bindings;
 }
 
