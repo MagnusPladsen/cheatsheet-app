@@ -137,13 +137,13 @@ jobs:
           # Fetch current cask formula
           CURRENT=$(curl -s -H "Authorization: token $HOMEBREW_TAP_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet.rb")
+            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet-app.rb")
 
           FILE_SHA=$(echo "$CURRENT" | jq -r '.sha')
 
           # Generate updated formula
           FORMULA=$(cat <<'RUBY'
-          cask "cheatsheet" do
+          cask "cheatsheet-app" do
             arch arm: "aarch64", intel: "x64"
 
             version "VERSION_PLACEHOLDER"
