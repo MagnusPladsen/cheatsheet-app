@@ -8,7 +8,7 @@ export function parseNeovim(files: Map<string, string>): Binding[] {
     if (path.includes("astrocore") || path.includes("mappings.lua") || path.includes("astrolsp")) {
       bindings.push(...parseLuaMappings(content, path));
     }
-    if (path.includes("init.lua")) {
+    if (path.endsWith(".lua")) {
       bindings.push(...parseVimKeymapSet(content));
     }
     if (path.endsWith(".vimrc")) {
