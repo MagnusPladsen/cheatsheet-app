@@ -52,7 +52,9 @@ export function AppSection({ appId, results, index }: AppSectionProps) {
 
       {!collapsed && (
         <div className="space-y-4">
-          {Object.entries(grouped).map(([category, catResults]) => (
+          {Object.entries(grouped)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([category, catResults]) => (
             <div key={category}>
               <h3 className="text-xs text-accent/50 tracking-widest mb-1.5 pl-0.5">
                 -- {lc(category)}
