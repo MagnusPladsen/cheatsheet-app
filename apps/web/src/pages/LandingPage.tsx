@@ -296,208 +296,261 @@ function CodeSnippet({ children }: { children: string }) {
   );
 }
 
-function DownloadLink({ href, children }: { href: string | null; children: React.ReactNode }) {
+function BigDownloadButton({
+  href,
+  icon,
+  label,
+  sublabel,
+  version,
+}: {
+  href: string | null;
+  icon: React.ReactNode;
+  label: string;
+  sublabel: string;
+  version: string | null;
+}) {
   return (
     <a
       href={href || RELEASES_URL}
       target="_blank"
       rel="noreferrer"
-      className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer"
+      className="group flex items-center gap-4 px-6 py-5 border-2 border-accent/40 bg-accent/[0.04] rounded-xl hover:border-accent hover:bg-accent/10 transition-all cursor-pointer"
     >
-      <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
-      <span className="text-xs group-hover:text-accent transition-colors">{children}</span>
+      <div className="shrink-0 w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm text-text-primary font-medium tracking-wider group-hover:text-accent transition-colors">
+          {label}
+        </div>
+        <div className="text-xs text-text-muted mt-0.5">
+          {sublabel}
+          {version && <span className="text-text-muted/50"> · v{version}</span>}
+        </div>
+      </div>
+      <Download className="w-5 h-5 text-accent/60 group-hover:text-accent transition-colors shrink-0" />
     </a>
   );
 }
 
-function MacBlock({ release }: { release: ReleaseAssets }) {
-  return (
-    <>
-      <InstallBlock
-        title="macos (homebrew)"
-        icon={<Apple className="w-4 h-4 text-text-muted" />}
-      >
-        <p className="text-text-muted mb-2">recommended. auto-updates via brew.</p>
-        <CodeSnippet>brew tap magnuspladsen/cheatsheet</CodeSnippet>
-        <CodeSnippet>brew install cheatsheet-app</CodeSnippet>
-        <p className="text-[10px] text-text-muted mt-2">
-          first launch fix if needed:{" "}
-          <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
-        </p>
-      </InstallBlock>
-      <InstallBlock
-        title="macos (direct download)"
-        icon={<Apple className="w-4 h-4 text-text-muted" />}
-      >
-        <p className="text-text-muted mb-2">
-          download the .dmg for your architecture.
-          {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
-        </p>
-        <div className="space-y-1.5">
-          <DownloadLink href={release.dmgArm}>apple silicon (m1/m2/m3/m4)</DownloadLink>
-          <DownloadLink href={release.dmgIntel}>intel</DownloadLink>
-        </div>
-      </InstallBlock>
-    </>
-  );
-}
-
-function ArchBlock() {
-  return (
-    <InstallBlock
-      title="arch linux (aur)"
-      icon={<Terminal className="w-4 h-4 text-text-muted" />}
-    >
-      <p className="text-text-muted mb-2">available on the aur. use your preferred aur helper.</p>
-      <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
-      <p className="text-[10px] text-text-muted mt-1">
-        or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
-      </p>
-    </InstallBlock>
-  );
-}
-
-function DebBlock({ release }: { release: ReleaseAssets }) {
-  return (
-    <InstallBlock
-      title="debian / ubuntu / mint"
-      icon={<Terminal className="w-4 h-4 text-text-muted" />}
-    >
-      <p className="text-text-muted mb-2">
-        download the .deb
-        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
-        {" "}and install:
-      </p>
-      <DownloadLink href={release.deb}>download .deb</DownloadLink>
-      <div className="mt-2" />
-      <CodeSnippet>sudo dpkg -i cheatsheet_*_amd64.deb</CodeSnippet>
-      <CodeSnippet>sudo apt-get install -f</CodeSnippet>
-    </InstallBlock>
-  );
-}
-
-function RpmBlock({ release }: { release: ReleaseAssets }) {
-  return (
-    <InstallBlock
-      title="fedora / rhel"
-      icon={<Terminal className="w-4 h-4 text-text-muted" />}
-    >
-      <p className="text-text-muted mb-2">
-        download the .rpm
-        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
-        {" "}and install:
-      </p>
-      <DownloadLink href={release.rpm}>download .rpm</DownloadLink>
-      <div className="mt-2" />
-      <CodeSnippet>sudo rpm -i cheatsheet-*.x86_64.rpm</CodeSnippet>
-    </InstallBlock>
-  );
-}
-
-function AppImageBlock({ release }: { release: ReleaseAssets }) {
-  return (
-    <InstallBlock
-      title="appimage (any linux)"
-      icon={<Terminal className="w-4 h-4 text-text-muted" />}
-    >
-      <p className="text-text-muted mb-2">
-        universal linux binary.
-        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
-      </p>
-      <DownloadLink href={release.appImage}>download .appimage</DownloadLink>
-      <div className="mt-2" />
-      <CodeSnippet>chmod +x cheatsheet_*_amd64.AppImage</CodeSnippet>
-      <CodeSnippet>./cheatsheet_*_amd64.AppImage</CodeSnippet>
-    </InstallBlock>
-  );
-}
-
 function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAssets }) {
-  // Recommended block for detected OS
-  const recommended = userOS === "mac" ? (
-    <div className="md:col-span-2 border border-accent/30 bg-accent/[0.03] rounded-lg p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Apple className="w-4 h-4 text-accent" />
-        <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
-        <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
-          macos detected
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="font-mono text-xs text-text-secondary space-y-2">
-          <p className="text-text-muted mb-2">homebrew (auto-updates):</p>
-          <CodeSnippet>brew tap magnuspladsen/cheatsheet</CodeSnippet>
-          <CodeSnippet>brew install cheatsheet-app</CodeSnippet>
-          <p className="text-[10px] text-text-muted mt-2">
-            first launch fix if needed:{" "}
-            <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
-          </p>
-        </div>
-        <div className="font-mono text-xs text-text-secondary space-y-2">
-          <p className="text-text-muted mb-2">
-            or download directly
-            {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
-            :
-          </p>
-          <DownloadLink href={release.dmgArm}>apple silicon (m1/m2/m3/m4) .dmg</DownloadLink>
-          <DownloadLink href={release.dmgIntel}>intel .dmg</DownloadLink>
-        </div>
-      </div>
-    </div>
-  ) : userOS.startsWith("linux") ? (
-    <div className="md:col-span-2 border border-accent/30 bg-accent/[0.03] rounded-lg p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Terminal className="w-4 h-4 text-accent" />
-        <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
-        <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
-          linux detected
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="font-mono text-xs text-text-secondary space-y-2">
-          <p className="text-text-muted mb-1">arch (aur):</p>
-          <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
-        </div>
-        <div className="font-mono text-xs text-text-secondary space-y-2">
-          <p className="text-text-muted mb-1">debian / ubuntu:</p>
-          <DownloadLink href={release.deb}>download .deb</DownloadLink>
-        </div>
-        <div className="font-mono text-xs text-text-secondary space-y-2">
-          <p className="text-text-muted mb-1">fedora / rhel:</p>
-          <DownloadLink href={release.rpm}>download .rpm</DownloadLink>
-        </div>
-      </div>
-      <div className="mt-3 font-mono text-xs text-text-secondary space-y-2">
-        <p className="text-text-muted mb-1">or use the universal appimage:</p>
-        <DownloadLink href={release.appImage}>download .appimage</DownloadLink>
-      </div>
-    </div>
-  ) : null;
-
-  // Other OS blocks shown below
-  const otherBlocks = userOS === "mac" ? (
-    <>
-      <ArchBlock />
-      <DebBlock release={release} />
-      <RpmBlock release={release} />
-      <AppImageBlock release={release} />
-    </>
-  ) : userOS.startsWith("linux") ? (
-    <MacBlock release={release} />
-  ) : (
-    <>
-      <MacBlock release={release} />
-      <ArchBlock />
-      <DebBlock release={release} />
-      <RpmBlock release={release} />
-      <AppImageBlock release={release} />
-    </>
-  );
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {recommended}
-      {otherBlocks}
+    <div className="space-y-8">
+      {/* Detected OS — big download buttons */}
+      {userOS === "mac" && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Apple className="w-4 h-4 text-accent" />
+            <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
+            <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
+              macos detected
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <BigDownloadButton
+              href={release.dmgArm}
+              icon={<Apple className="w-6 h-6 text-accent" />}
+              label="download for apple silicon"
+              sublabel="m1 / m2 / m3 / m4 · .dmg"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.dmgIntel}
+              icon={<Apple className="w-6 h-6 text-accent" />}
+              label="download for intel"
+              sublabel="x86_64 · .dmg"
+              version={release.version}
+            />
+          </div>
+          <div className="font-mono text-xs text-text-secondary space-y-2 mt-4">
+            <p className="text-text-muted">or install via homebrew:</p>
+            <CodeSnippet>brew tap magnuspladsen/cheatsheet && brew install cheatsheet-app</CodeSnippet>
+            <p className="text-[10px] text-text-muted mt-2">
+              first launch fix if needed:{" "}
+              <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {userOS.startsWith("linux") && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Terminal className="w-4 h-4 text-accent" />
+            <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
+            <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
+              linux detected
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <BigDownloadButton
+              href={release.deb}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="download .deb"
+              sublabel="debian / ubuntu / mint"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.rpm}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="download .rpm"
+              sublabel="fedora / rhel"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.appImage}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="download .appimage"
+              sublabel="universal linux"
+              version={release.version}
+            />
+          </div>
+          <div className="font-mono text-xs text-text-secondary space-y-2 mt-4">
+            <p className="text-text-muted">or install via aur (arch linux):</p>
+            <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
+            <p className="text-[10px] text-text-muted mt-1">
+              or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
+            </p>
+          </div>
+          <div className="font-mono text-xs text-text-secondary space-y-2 mt-2">
+            <p className="text-text-muted">after installing .deb:</p>
+            <CodeSnippet>sudo dpkg -i cheatsheet_*_amd64.deb && sudo apt-get install -f</CodeSnippet>
+          </div>
+        </div>
+      )}
+
+      {userOS === "unknown" && (
+        <div className="space-y-4">
+          <div className="mb-2">
+            <h4 className="text-sm text-text-primary font-medium tracking-wider">download desktop app</h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <BigDownloadButton
+              href={release.dmgArm}
+              icon={<Apple className="w-6 h-6 text-accent" />}
+              label="macos — apple silicon"
+              sublabel="m1 / m2 / m3 / m4 · .dmg"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.dmgIntel}
+              icon={<Apple className="w-6 h-6 text-accent" />}
+              label="macos — intel"
+              sublabel="x86_64 · .dmg"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.deb}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="linux — .deb"
+              sublabel="debian / ubuntu / mint"
+              version={release.version}
+            />
+            <BigDownloadButton
+              href={release.rpm}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="linux — .rpm"
+              sublabel="fedora / rhel"
+              version={release.version}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <BigDownloadButton
+              href={release.appImage}
+              icon={<FileDown className="w-6 h-6 text-accent" />}
+              label="linux — .appimage"
+              sublabel="universal linux"
+              version={release.version}
+            />
+          </div>
+          <div className="font-mono text-xs text-text-secondary space-y-2 mt-4">
+            <p className="text-text-muted">or install via package manager:</p>
+            <CodeSnippet>brew tap magnuspladsen/cheatsheet && brew install cheatsheet-app</CodeSnippet>
+            <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
+          </div>
+        </div>
+      )}
+
+      {/* Other OS options */}
+      {userOS !== "unknown" && (
+        <div className="border-t border-border pt-8">
+          <p className="text-xs text-text-muted tracking-wider mb-4">// other platforms</p>
+          {userOS === "mac" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InstallBlock
+                title="arch linux (aur)"
+                icon={<Terminal className="w-4 h-4 text-text-muted" />}
+              >
+                <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
+                <p className="text-[10px] text-text-muted mt-1">
+                  or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
+                </p>
+              </InstallBlock>
+              <InstallBlock
+                title="debian / ubuntu / mint"
+                icon={<Terminal className="w-4 h-4 text-text-muted" />}
+              >
+                <a href={release.deb || RELEASES_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-xs group-hover:text-accent transition-colors">download .deb{release.version && ` (v${release.version})`}</span>
+                </a>
+                <div className="mt-2" />
+                <CodeSnippet>sudo dpkg -i cheatsheet_*_amd64.deb && sudo apt-get install -f</CodeSnippet>
+              </InstallBlock>
+              <InstallBlock
+                title="fedora / rhel"
+                icon={<Terminal className="w-4 h-4 text-text-muted" />}
+              >
+                <a href={release.rpm || RELEASES_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-xs group-hover:text-accent transition-colors">download .rpm{release.version && ` (v${release.version})`}</span>
+                </a>
+                <div className="mt-2" />
+                <CodeSnippet>sudo rpm -i cheatsheet-*.x86_64.rpm</CodeSnippet>
+              </InstallBlock>
+              <InstallBlock
+                title="appimage (any linux)"
+                icon={<Terminal className="w-4 h-4 text-text-muted" />}
+              >
+                <a href={release.appImage || RELEASES_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-xs group-hover:text-accent transition-colors">download .appimage{release.version && ` (v${release.version})`}</span>
+                </a>
+                <div className="mt-2" />
+                <CodeSnippet>chmod +x cheatsheet_*_amd64.AppImage && ./cheatsheet_*_amd64.AppImage</CodeSnippet>
+              </InstallBlock>
+            </div>
+          )}
+          {userOS.startsWith("linux") && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InstallBlock
+                title="macos (homebrew)"
+                icon={<Apple className="w-4 h-4 text-text-muted" />}
+              >
+                <CodeSnippet>brew tap magnuspladsen/cheatsheet && brew install cheatsheet-app</CodeSnippet>
+                <p className="text-[10px] text-text-muted mt-2">
+                  first launch fix if needed:{" "}
+                  <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
+                </p>
+              </InstallBlock>
+              <InstallBlock
+                title="macos (direct download)"
+                icon={<Apple className="w-4 h-4 text-text-muted" />}
+              >
+                <a href={release.dmgArm || RELEASES_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-xs group-hover:text-accent transition-colors">apple silicon .dmg{release.version && ` (v${release.version})`}</span>
+                </a>
+                <div className="mt-1.5" />
+                <a href={release.dmgIntel || RELEASES_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-xs group-hover:text-accent transition-colors">intel .dmg{release.version && ` (v${release.version})`}</span>
+                </a>
+              </InstallBlock>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
