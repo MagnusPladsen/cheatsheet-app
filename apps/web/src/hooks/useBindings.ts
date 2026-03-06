@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { Binding } from "@cheatsheet/shared";
+import type { AppId, Binding } from "@cheatsheet/shared";
 import { APP_LIST, parsers, resetIdCounter, getDefaultBindings } from "@cheatsheet/shared";
 import { fetchAllFiles } from "../services/github.ts";
 import { clearCache } from "../services/cache.ts";
@@ -43,7 +43,8 @@ export function useBindings(repos: GitHubRepo[]): UseBindingsReturn {
         }
       }
 
-      const defaults = getDefaultBindings();
+      const activeApps = new Set<AppId>(customBindings.map((b) => b.app));
+      const defaults = getDefaultBindings(activeApps);
       setBindings([...customBindings, ...defaults]);
       setLastFetched(new Date());
     } catch (err) {

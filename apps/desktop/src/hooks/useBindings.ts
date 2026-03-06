@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import type { Binding } from "@cheatsheet/shared";
+import type { AppId, Binding } from "@cheatsheet/shared";
 import { APP_LIST, parsers, resetIdCounter, getDefaultBindings } from "@cheatsheet/shared";
 
 interface UseBindingsReturn {
@@ -60,7 +60,8 @@ export function useBindings(): UseBindingsReturn {
         }
       }
 
-      const defaults = getDefaultBindings();
+      const activeApps = new Set<AppId>(customBindings.map((b) => b.app));
+      const defaults = getDefaultBindings(activeApps);
       setBindings([...customBindings, ...defaults]);
       setLastFetched(new Date());
     } catch (err) {
