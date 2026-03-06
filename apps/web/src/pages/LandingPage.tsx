@@ -79,7 +79,7 @@ const FEATURES = [
   {
     icon: Monitor,
     title: "desktop + web",
-    desc: "native desktop app reads your real config files. web version works with defaults or shared urls",
+    desc: "native desktop app reads your real local config files instantly. web version connects to your public github dotfiles repo",
     span: "col-span-1",
   },
 ];
@@ -421,6 +421,106 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Why Desktop */}
+      <section className="py-24 px-6 border-t border-border">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12">
+            <p className="text-xs text-accent/60 tracking-[0.3em] uppercase mb-3">
+              // web vs desktop
+            </p>
+            <h2 className="text-2xl md:text-3xl font-display text-text-primary">
+              why go <span className="text-accent">native</span>?
+            </h2>
+            <p className="text-xs text-text-muted mt-3 max-w-lg leading-relaxed">
+              the web app is great for a quick look, but the desktop app unlocks the full power
+              of cheatsheet by reading directly from your local config files.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Web column */}
+            <div className="border border-border bg-bg-secondary/30 rounded-lg p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <ExternalLink className="w-4 h-4 text-text-muted" />
+                <h3 className="text-sm text-text-primary font-medium tracking-wider">web app</h3>
+              </div>
+              <ul className="space-y-2.5 text-xs text-text-secondary">
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  no install — runs in your browser
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  connect your public github dotfiles repo
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  share bindings via url
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-text-muted mt-0.5 shrink-0">-</span>
+                  <span className="text-text-muted">requires public github repo with dotfiles</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-text-muted mt-0.5 shrink-0">-</span>
+                  <span className="text-text-muted">can't read private repos or local-only configs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-text-muted mt-0.5 shrink-0">-</span>
+                  <span className="text-text-muted">relies on github api (rate limits, caching)</span>
+                </li>
+              </ul>
+              <Link
+                to="/app"
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2 border border-border text-text-secondary text-xs tracking-wider hover:border-accent/40 hover:text-accent transition-colors cursor-pointer"
+              >
+                try web app <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            {/* Desktop column */}
+            <div className="border border-accent/30 bg-accent/[0.03] rounded-lg p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Monitor className="w-4 h-4 text-accent" />
+                <h3 className="text-sm text-accent font-medium tracking-wider">desktop app</h3>
+                <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
+                  recommended
+                </span>
+              </div>
+              <ul className="space-y-2.5 text-xs text-text-secondary">
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  reads your actual local config files — always up to date
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  works with private configs, no github needed
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  instant — no network requests, no rate limits
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  native performance (tauri/rust)
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  macos + linux — homebrew, aur, deb, rpm, appimage
+                </li>
+              </ul>
+              <a
+                href="#download"
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-accent text-bg-primary text-xs font-medium tracking-wider hover:bg-accent-light transition-colors cursor-pointer"
+              >
+                <Download className="w-3 h-3" />
+                download desktop app
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Download / Install */}
       <section
         id="download"
@@ -438,25 +538,26 @@ export default function LandingPage() {
               get <span className="text-accent">cheatsheet</span>
             </h2>
             <p className="text-xs text-text-muted mt-3 max-w-lg leading-relaxed">
-              the desktop app reads your real local config files for live keybindings.
-              the web app works with bundled defaults — no install needed.
+              the desktop app reads your real local config files — no github repo needed,
+              no network requests. just launch and see your bindings.
             </p>
           </div>
 
-          {/* Web — prominent */}
-          <div className="mb-8 border border-accent/30 bg-accent/[0.03] rounded-lg p-6">
+          {/* Web — secondary */}
+          <div className="mb-8 border border-border bg-bg-secondary/30 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-3">
-              <ExternalLink className="w-5 h-5 text-accent" />
-              <h3 className="text-base text-accent font-medium tracking-wider">
+              <ExternalLink className="w-5 h-5 text-text-muted" />
+              <h3 className="text-base text-text-primary font-medium tracking-wider">
                 web app — no install
               </h3>
             </div>
             <p className="text-xs text-text-secondary mb-4">
-              use cheatsheet directly in your browser. works with default bindings or shared urls.
+              try cheatsheet in your browser. connect your public github dotfiles repo to see your own
+              bindings, or browse the defaults. no signup required.
             </p>
             <Link
               to="/app"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg-primary text-sm font-medium tracking-wider hover:bg-accent-light transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-text-secondary text-sm tracking-wider hover:border-accent/40 hover:text-accent transition-colors cursor-pointer"
             >
               open web app
               <ArrowRight className="w-4 h-4" />

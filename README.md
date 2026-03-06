@@ -9,7 +9,7 @@
 ![macOS](https://img.shields.io/badge/macOS-arm64%20%7C%20x64-black?logo=apple)
 ![Linux](https://img.shields.io/badge/Linux-x64-black?logo=linux&logoColor=white)
 
-A developer keybinding cheatsheet that parses your actual config files and displays all your bindings in a searchable, filterable UI. Available as a [web app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app) and a native desktop app (Tauri).
+A developer keybinding cheatsheet that parses your actual config files and displays all your bindings in a searchable, filterable UI. Available as a [web app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app) (connect your GitHub dotfiles repo) and a native [desktop app](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest) (reads local config files directly).
 
 <!-- IMAGE: hero screenshot of the app showing the main UI with bindings -->
 
@@ -17,13 +17,24 @@ A developer keybinding cheatsheet that parses your actual config files and displ
 
 | Tool | Config Parsed |
 |------|--------------|
-| Neovim | `init.lua` / keymaps |
-| Tmux | `.tmux.conf` |
-| AeroSpace | `aerospace.toml` |
-| Kitty | `kitty.conf` |
+| Neovim | `init.lua` / keymaps / AstroNvim |
+| Vim | `.vimrc` |
 | Zed | `keymap.json` |
+| VS Code | `keybindings.json` |
+| Cursor | `keybindings.json` |
+| Tmux | `.tmux.conf` |
+| Kitty | `kitty.conf` |
+| Ghostty | `ghostty/config` |
+| WezTerm | `.wezterm.lua` |
+| Alacritty | `alacritty.toml` |
 | Zsh | `.zshrc` aliases |
 | Espanso | `match/*.yml` |
+| Lazygit | `config.yml` |
+| AeroSpace | `aerospace.toml` |
+| skhd / Yabai | `.skhdrc` |
+| i3 / Sway | `i3/config` / `sway/config` |
+| Hyprland | `hyprland.conf` |
+| Obsidian | `hotkeys.json` |
 
 ## Features
 
@@ -92,7 +103,9 @@ chmod +x cheatsheet_*_amd64.AppImage
 
 No install needed — use it directly at [my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app).
 
-The web version reads bindings from the bundled defaults. The desktop app reads your actual local config files.
+The web version can connect to any public GitHub dotfiles repo to display your keybindings. Enter your repo URL (e.g. `username/dotfiles`) in the app and it's saved to your browser. No signup required.
+
+> **Note:** The web app requires a **public** GitHub repo. For private configs or local-only setups, use the desktop app — it reads directly from your filesystem with no network needed.
 
 ## Quick Start
 
