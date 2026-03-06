@@ -16,6 +16,7 @@ import { parseSkhd } from "./skhd";
 import { parseI3 } from "./i3";
 import { parseHyprland } from "./hyprland";
 import { parseObsidian } from "./obsidian";
+import { parseBash } from "./bash";
 
 export type Parser = (files: Map<string, string>) => Binding[];
 
@@ -38,6 +39,7 @@ export const parsers: Record<AppId, Parser> = {
   i3: parseI3,
   hyprland: parseHyprland,
   obsidian: parseObsidian,
+  bash: parseBash,
 };
 
 let idCounter = 0;

@@ -16,7 +16,8 @@ export type AppId =
   | "skhd"
   | "i3"
   | "hyprland"
-  | "obsidian";
+  | "obsidian"
+  | "bash";
 
 export interface Binding {
   id: string;

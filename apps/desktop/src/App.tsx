@@ -20,9 +20,11 @@ import { useWindowManager } from "./hooks/useWindowManager.ts";
 import { useGlobalShortcut } from "./hooks/useGlobalShortcut.ts";
 import { useTray } from "./hooks/useTray.ts";
 import { useFileWatcher } from "./hooks/useFileWatcher.ts";
+import { getVersion } from "@tauri-apps/api/app";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import { FolderPicker } from "./components/FolderPicker.tsx";
+import { useUpdater } from "./hooks/useUpdater.ts";
 
 export default function App() {
   const { bindings, loading, error, lastFetched, refresh, folders, addFolder, removeFolder } = useBindings();
@@ -38,6 +40,9 @@ export default function App() {
   useTray({ onShow: showNormal, onHide: hide, onToggle: toggleOverlay });
   useFileWatcher(folders, refresh);
 
+  const [appVersion, setAppVersion] = useState("");
+  useEffect(() => { getVersion().then(setAppVersion); }, []);
+  const updater = useUpdater();
   const [showSettings, setShowSettings] = useState(false);
   const [showPractice, setShowPractice] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -129,6 +134,29 @@ export default function App() {
           inputRef: compactSearchRef,
         }}
       />
+
+      {updater.available && !updater.dismissed && (
+        <div className="bg-accent/10 border-b border-accent/30 px-6 py-3 flex items-center justify-between">
+          <p className="text-xs text-accent tracking-wider">
+            {lc(`update available: v${updater.version}`)}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={updater.dismiss}
+              className="text-xs text-text-muted hover:text-text-primary transition-colors tracking-wider cursor-pointer"
+            >
+              {lc("later")}
+            </button>
+            <button
+              onClick={updater.install}
+              disabled={updater.installing}
+              className="px-3 py-1 border border-accent/50 text-accent text-xs tracking-wider hover:bg-accent/10 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {updater.installing ? lc("installing...") : lc("update & restart")}
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         {/* Settings toggle */}
@@ -230,6 +258,7 @@ export default function App() {
 
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-text-muted tracking-wider">
+          {appVersion && <>{lc(`v${appVersion}`)}{" "}&middot;{" "}</>}
           {lc("// reading local configs")}
           {" "}&middot; {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
         </p>

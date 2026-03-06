@@ -48,6 +48,21 @@ fn detect_includes(content: &str, file_path: &Path, file_ext: &str) -> Vec<PathB
                 includes.push(resolved);
             }
         }
+        // bash: source <path> or . <path>
+        "bashrc" | "bash_aliases" | "bash_profile"
+            if file_path.to_string_lossy().contains("bash") =>
+        {
+            let re = Regex::new(r#"(?m)^\s*(?:source|\.) +["']?([^"'\s#;]+)["']?"#).unwrap();
+            for cap in re.captures_iter(content) {
+                let raw = &cap[1];
+                if raw.contains('$') && !raw.contains("$HOME") && !raw.contains("${HOME}") {
+                    continue;
+                }
+                let p = expand_home(raw);
+                let resolved = if p.is_absolute() { p } else { parent.join(p) };
+                includes.push(resolved);
+            }
+        }
         // zsh: source <path> or . <path>
         "zshrc" | "" if file_path.to_string_lossy().contains("zsh") => {
             let re = Regex::new(r#"(?m)^\s*(?:source|\.) +["']?([^"'\s#;]+)["']?"#).unwrap();
@@ -131,6 +146,8 @@ fn file_ext_hint(path: &Path) -> &str {
         "conf"
     } else if name.contains("zsh") || name == ".zshrc" {
         "zshrc"
+    } else if name == ".bashrc" || name == ".bash_aliases" || name == ".bash_profile" {
+        "bashrc"
     } else {
         ""
     }
@@ -238,6 +255,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![
             read_config_files,
             get_stored_folders,

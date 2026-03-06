@@ -148,6 +148,13 @@ export const APPS: Record<AppId, AppConfig> = {
     color: "text-purple-300",
     filePaths: [".obsidian/hotkeys.json"],
   },
+  bash: {
+    id: "bash",
+    name: "Bash Aliases",
+    icon: "\uD83D\uDCBB",
+    color: "text-emerald-400",
+    filePaths: [".bashrc", ".bash_aliases", ".bash_profile"],
+  },
 };
 
 export const APP_LIST = Object.values(APPS);

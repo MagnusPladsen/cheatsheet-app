@@ -28,6 +28,7 @@ A developer keybinding cheatsheet that parses your actual config files and displ
 | WezTerm | `.wezterm.lua` |
 | Alacritty | `alacritty.toml` |
 | Zsh | `.zshrc` aliases |
+| Bash | `.bashrc` / `.bash_aliases` / `.bash_profile` |
 | Espanso | `match/*.yml` |
 | Lazygit | `config.yml` |
 | AeroSpace | `aerospace.toml` |

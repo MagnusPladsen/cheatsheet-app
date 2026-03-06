@@ -84,6 +84,7 @@ const SUPPORTED_TOOLS = [
   { name: "i3 / Sway", color: "#38BDF8" },
   { name: "Hyprland", color: "#67E8F9" },
   { name: "Obsidian", color: "#C084FC" },
+  { name: "Bash", color: "#34D399" },
 ];
 
 const FEATURES = [
@@ -647,7 +648,7 @@ export default function LandingPage() {
               // supported tools
             </p>
             <h2 className="text-2xl md:text-3xl font-display text-text-primary">
-              <span className="text-accent">18</span> tools and counting
+              <span className="text-accent">19</span> tools and counting
             </h2>
             <p className="text-xs text-text-muted mt-3 max-w-lg leading-relaxed">
               cheatsheet parses the actual config files for each tool.

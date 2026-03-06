@@ -291,6 +291,7 @@ version = "1.0.0"
 dependencies = [
  "dirs",
  "glob",
+ "regex",
  "serde",
  "serde_json",
  "tauri",
