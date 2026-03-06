@@ -299,9 +299,9 @@ export default function LandingPage() {
                 in one place
               </h1>
               <p className="text-sm text-text-secondary leading-relaxed max-w-md">
-                parses your actual config files and displays every keybinding
-                in a searchable, filterable ui. supports 18+ developer tools.
-                free and open source.
+                parses your actual config files — including sourced files and
+                includes — and displays every keybinding in a searchable,
+                filterable ui. supports 18+ developer tools. free and open source.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -467,6 +467,10 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-text-muted mt-0.5 shrink-0">-</span>
+                  <span className="text-text-muted">can't follow source/include directives in configs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-text-muted mt-0.5 shrink-0">-</span>
                   <span className="text-text-muted">relies on github api (rate limits, caching)</span>
                 </li>
               </ul>
@@ -491,6 +495,10 @@ export default function LandingPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-0.5 shrink-0">+</span>
                   reads your actual local config files — always up to date
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent mt-0.5 shrink-0">+</span>
+                  follows source/include directives — picks up sourced tmux configs, zsh plugins, neovim requires, and vim runtime files
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-0.5 shrink-0">+</span>

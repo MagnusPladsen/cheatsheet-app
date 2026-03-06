@@ -42,9 +42,29 @@ A developer keybinding cheatsheet that parses your actual config files and displ
 - **Filter by app** to focus on specific tools
 - **Conflict detection** to find overlapping keybindings across tools
 - **Practice mode** to test your keybinding knowledge
-- **Export** bindings as JSON or markdown
+- **Export** bindings as JSON, PNG, or PDF
 - **Share** bindings via URL
-- **Themes** with light and dark mode
+- **12 themes** — hacker, tokyo night, dracula, catppuccin, nord, gruvbox, kanagawa, monokai, rose pine, and more
+
+### Desktop App
+
+The desktop app reads config files directly from your filesystem — no GitHub repo or network needed.
+
+- **Follows source/include directives** — automatically picks up bindings from sourced tmux configs (`source-file`), zsh plugins (`source`/`.`), neovim lua modules (`require()`/`dofile()`), and vim runtime files (`source`/`runtime`)
+- **Recursive resolution** up to 3 levels deep with cycle detection
+- **Expands `~` and `$HOME`** in include paths
+- **Watches for file changes** and re-parses automatically
+- **System tray** with global shortcut (`Cmd+Shift+K`) to toggle the app
+- **Multiple config folders** — add custom directories beyond `$HOME`
+
+### Web App
+
+The web app runs in your browser with no install required.
+
+- **Connect your GitHub dotfiles repo** — enter `owner/repo` or a full URL and see your own keybindings
+- **Saved to localStorage** — your repo choice persists across sessions
+- **Share bindings via URL** — generate links others can open directly
+- Works with any public GitHub repo containing dotfiles
 
 <!-- IMAGE: screenshot showing search with highlighted matches -->
 
@@ -131,6 +151,14 @@ The web version can connect to any public GitHub dotfiles repo to display your k
 
 6. **Export & Share** — export your bindings as JSON/markdown, or generate a shareable URL
 
+## What's New in v1.1.0
+
+- **Landing page** — new homepage with features overview, supported tools, and download guides
+- **Configurable GitHub repo (web)** — connect your own public dotfiles repo instead of using the default
+- **Follow source/include directives (desktop)** — tmux `source-file`, zsh `source`/`.`, neovim `require()`/`dofile()`, vim `source`/`runtime` are now followed recursively (up to 3 levels, with cycle detection)
+- **11 new parsers** — Vim, VS Code, Cursor, Ghostty, WezTerm, Alacritty, Lazygit, skhd, i3/Sway, Hyprland, Obsidian
+- **Web vs Desktop comparison** — landing page highlights why the desktop app is recommended
+
 ## Tech Stack
 
 | Layer | Tech |
@@ -190,7 +218,7 @@ Push a version tag to trigger a GitHub Actions build:
 
 ```bash
 # Bump version in package.json and apps/desktop/src-tauri/tauri.conf.json, then:
-git tag v1.0.7
+git tag v1.1.1
 git push origin main --tags
 ```
 
