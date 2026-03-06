@@ -22,6 +22,18 @@ export function useBindings(repos: GitHubRepo[]): UseBindingsReturn {
 
   // Stable serialized key for deps
   const reposKey = repos.map((r) => `${r.owner}/${r.repo}`).join(",");
+  const prevReposKey = useRef(reposKey);
+
+  // Synchronously set loading when repos change (avoids blank-screen flash)
+  if (reposKey !== prevReposKey.current) {
+    prevReposKey.current = reposKey;
+    if (repos.length > 0) {
+      setLoading(true);
+    } else {
+      setBindings([]);
+      setLoading(false);
+    }
+  }
 
   const fetchBindings = useCallback(async (force = false) => {
     if (repos.length === 0) return;
@@ -55,11 +67,7 @@ export function useBindings(repos: GitHubRepo[]): UseBindingsReturn {
   }, [reposKey]);
 
   useEffect(() => {
-    if (repos.length === 0) {
-      setBindings([]);
-      setLoading(false);
-      return;
-    }
+    if (repos.length === 0) return;
     fetchBindings();
     intervalRef.current = setInterval(() => fetchBindings(), 5 * 60 * 1000);
     return () => clearInterval(intervalRef.current);
