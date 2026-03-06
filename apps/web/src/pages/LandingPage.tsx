@@ -102,14 +102,14 @@ const FEATURES = [
   },
   {
     icon: Crosshair,
-    title: "conflict detection",
-    desc: "discover overlapping keybindings across different tools before they bite you",
+    title: "overlap detection",
+    desc: "find shared keybindings across tools. note: overlapping keys in different apps aren't necessarily conflicts — most tools have independent key scopes",
     span: "col-span-1",
   },
   {
     icon: Keyboard,
-    title: "practice mode",
-    desc: "test your keybinding knowledge with an interactive quiz. track streaks and high scores",
+    title: "practice mode (experimental)",
+    desc: "test your keybinding knowledge with an interactive quiz. track streaks and high scores. still a work in progress — some key combos may not register correctly",
     span: "col-span-1 md:col-span-2",
   },
   {
@@ -598,6 +598,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-0.5 text-[10px] bg-amber-400/10 text-amber-400 border border-amber-400/20 rounded tracking-wider">
+                  early development
+                </span>
+              </div>
               <p className="text-xs text-accent/60 tracking-[0.3em] uppercase">
                 // developer keybinding viewer
               </p>
@@ -610,7 +615,8 @@ export default function LandingPage() {
               <p className="text-sm text-text-secondary leading-relaxed max-w-md">
                 parses your actual config files — including sourced files and
                 includes — and displays every keybinding in a searchable,
-                filterable ui. supports 18+ developer tools. free and open source.
+                filterable ui. supports 19 developer tools. free and open source.
+                stable and working, but still under active development.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

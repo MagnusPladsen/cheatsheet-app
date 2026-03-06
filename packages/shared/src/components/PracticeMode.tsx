@@ -252,8 +252,13 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
       <div className="fixed inset-0 z-50 bg-bg-primary/95 flex items-center justify-center">
         <div className="max-w-md w-full p-6 space-y-4">
           <div className="text-center space-y-2">
-            <h2 className="text-sm font-bold text-accent tracking-wider">{lc("// practice mode")}</h2>
-            <p className="text-xs text-text-muted">{lc("choose your challenge")}</p>
+            <div className="flex items-center justify-center gap-2">
+              <h2 className="text-sm font-bold text-accent tracking-wider">{lc("// practice mode")}</h2>
+              <span className="px-1.5 py-0.5 text-[9px] bg-amber-400/10 text-amber-400 border border-amber-400/20 rounded tracking-wider">
+                {lc("experimental")}
+              </span>
+            </div>
+            <p className="text-xs text-text-muted">{lc("choose your challenge. some key combos may not register correctly.")}</p>
           </div>
 
           <div className="space-y-1">
