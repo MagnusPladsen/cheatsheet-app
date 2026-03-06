@@ -18,6 +18,7 @@ import {
   decodeBindings,
 } from "@cheatsheet/shared";
 import type { AppId, SearchResult, Binding } from "@cheatsheet/shared";
+import { Link } from "react-router";
 import { useBindings } from "../hooks/useBindings.ts";
 import { useGitHubRepos } from "../hooks/useGitHubRepo.ts";
 import { clearCache } from "../services/cache.ts";
@@ -92,6 +93,13 @@ function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
             </a>
             {lc(".")}
           </p>
+
+          <Link
+            to="/"
+            className="block text-center text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider pt-2"
+          >
+            {lc("← back to home")}
+          </Link>
         </div>
       </div>
     </div>
@@ -495,6 +503,10 @@ export default function CheatsheetApp() {
             </>
           )}
           {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
+          {" "}&middot;{" "}
+          <Link to="/" className="text-accent/40 hover:text-accent transition-colors">
+            {lc("home")}
+          </Link>
         </p>
       </footer>
     </div>
