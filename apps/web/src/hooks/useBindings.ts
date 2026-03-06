@@ -3,9 +3,7 @@ import type { Binding } from "@cheatsheet/shared";
 import { APP_LIST, parsers, resetIdCounter, getDefaultBindings } from "@cheatsheet/shared";
 import { fetchAllFiles } from "../services/github.ts";
 import { clearCache } from "../services/cache.ts";
-
-const GITHUB_OWNER = "MagnusPladsen";
-const GITHUB_REPO = "dotfiles";
+import type { GitHubRepo } from "./useGitHubRepo.ts";
 
 interface UseBindingsReturn {
   bindings: Binding[];
@@ -15,7 +13,7 @@ interface UseBindingsReturn {
   refresh: () => void;
 }
 
-export function useBindings(): UseBindingsReturn {
+export function useBindings(ghRepo: GitHubRepo): UseBindingsReturn {
   const [bindings, setBindings] = useState<Binding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +31,7 @@ export function useBindings(): UseBindingsReturn {
       const customBindings: Binding[] = [];
 
       for (const app of APP_LIST) {
-        const files = await fetchAllFiles(GITHUB_OWNER, GITHUB_REPO, app.filePaths);
+        const files = await fetchAllFiles(ghRepo.owner, ghRepo.repo, app.filePaths);
         const parsed = parsers[app.id](files);
         customBindings.push(...parsed);
       }
@@ -46,7 +44,7 @@ export function useBindings(): UseBindingsReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [ghRepo.owner, ghRepo.repo]);
 
   useEffect(() => {
     fetchBindings();
