@@ -54,17 +54,17 @@ export function Header({
               value={compactSearch.value}
               onChange={(e) => compactSearch.onChange(e.target.value)}
               placeholder={lc("grep bindings...")}
-              className="flex-1 bg-transparent text-xs text-text-primary placeholder:text-text-muted/50 focus:outline-none"
+              className="flex-1 bg-transparent text-xs text-text-primary placeholder:text-text-muted/70 focus:outline-none"
             />
             {compactSearch.value && (
               <button
                 onClick={() => compactSearch.onChange("")}
-                className="text-[10px] text-text-muted hover:text-accent transition-colors"
+                className="text-[11px] text-text-muted hover:text-accent transition-colors"
               >
                 {lc("esc")}
               </button>
             )}
-            <span className="text-[10px] text-text-muted tabular-nums">
+            <span className="text-[11px] text-text-muted tabular-nums">
               {compactSearch.resultCount}/{compactSearch.totalCount}
             </span>
           </div>

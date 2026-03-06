@@ -60,7 +60,7 @@ function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <label className="text-[10px] text-text-muted tracking-wider">
+            <label className="text-[11px] text-text-muted tracking-wider">
               {lc("// github dotfiles repo")}
             </label>
             <input
@@ -70,10 +70,10 @@ function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
               onChange={(e) => { setInput(e.target.value); setError(""); }}
               onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
               placeholder="owner/repo or https://github.com/owner/repo"
-              className="w-full px-3 py-2.5 bg-bg-secondary border border-border text-sm text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+              className="w-full px-3 py-2.5 bg-bg-secondary border border-border text-sm text-text-primary placeholder:text-text-muted/60 focus:outline-none focus:border-accent/50 transition-colors"
             />
             {error && (
-              <p className="text-[10px] text-red-400 tracking-wider">{lc(error)}</p>
+              <p className="text-[11px] text-red-400 tracking-wider">{lc(error)}</p>
             )}
           </div>
 
@@ -84,7 +84,7 @@ function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
             {lc("connect & load bindings")}
           </button>
 
-          <p className="text-[10px] text-text-muted leading-relaxed">
+          <p className="text-[11px] text-text-muted leading-relaxed">
             {lc("the repo must be public. you can add multiple repos.")}
             <br />
             {lc("for private configs, use the")}{" "}
@@ -96,7 +96,7 @@ function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
 
           <Link
             to="/"
-            className="block text-center text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider pt-2"
+            className="block text-center text-[11px] text-text-muted hover:text-accent transition-colors tracking-wider pt-2"
           >
             {lc("← back to home")}
           </Link>
@@ -187,7 +187,7 @@ function RepoManagerModal({
                 </a>
                 <button
                   onClick={() => handleRemove(i)}
-                  className="text-[10px] text-red-400/60 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
+                  className="text-[11px] text-red-400/60 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
                 >
                   {lc("remove")}
                 </button>
@@ -198,7 +198,7 @@ function RepoManagerModal({
 
         {/* Add new repo */}
         <div className="space-y-2">
-          <label className="text-[10px] text-text-muted tracking-wider">
+          <label className="text-[11px] text-text-muted tracking-wider">
             {lc("// add repo")}
           </label>
           <div className="flex gap-2">
@@ -212,7 +212,7 @@ function RepoManagerModal({
                 if (e.key === "Escape") onClose();
               }}
               placeholder="owner/repo or https://github.com/owner/repo"
-              className="flex-1 px-3 py-2 bg-bg-secondary border border-border text-xs text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-accent/50 transition-colors"
+              className="flex-1 px-3 py-2 bg-bg-secondary border border-border text-xs text-text-primary placeholder:text-text-muted/70 focus:outline-none focus:border-accent/50 transition-colors"
             />
             <button
               onClick={handleAdd}
@@ -222,14 +222,14 @@ function RepoManagerModal({
             </button>
           </div>
           {error && (
-            <p className="text-[10px] text-red-400 tracking-wider">{lc(error)}</p>
+            <p className="text-[11px] text-red-400 tracking-wider">{lc(error)}</p>
           )}
         </div>
 
         <div className="flex items-center justify-between pt-2">
           <button
             onClick={handleDisconnectAll}
-            className="text-[10px] text-red-400/70 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
+            className="text-[11px] text-red-400/70 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
           >
             {lc("disconnect all")}
           </button>
@@ -346,11 +346,11 @@ export default function CheatsheetApp() {
         {/* Repo indicator bar */}
         {repos.length > 0 && (
           <div className="border border-border bg-bg-secondary/30 px-4 py-2.5 flex items-center justify-between">
-            <p className="text-[10px] text-text-muted tracking-wider">
+            <p className="text-[11px] text-text-muted tracking-wider">
               {lc("// source:")}{" "}
               {repos.map((r, i) => (
                 <span key={`${r.owner}/${r.repo}`}>
-                  {i > 0 && <span className="text-text-muted/40"> + </span>}
+                  {i > 0 && <span className="text-text-muted/60"> + </span>}
                   <a
                     href={`https://github.com/${r.owner}/${r.repo}`}
                     target="_blank"
@@ -364,7 +364,7 @@ export default function CheatsheetApp() {
             </p>
             <button
               onClick={() => setShowRepoConfig(true)}
-              className="text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
+              className="text-[11px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
             >
               {lc("manage repos")}
             </button>

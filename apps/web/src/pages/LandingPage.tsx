@@ -197,7 +197,7 @@ function TerminalAnimation() {
           <div className="w-3 h-3 rounded-full bg-red-500/70" />
           <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
           <div className="w-3 h-3 rounded-full bg-green-500/70" />
-          <span className="ml-3 text-[10px] text-text-muted font-mono tracking-wider">
+          <span className="ml-3 text-[11px] text-text-muted font-mono tracking-wider">
             cheatsheet
           </span>
         </div>
@@ -289,7 +289,7 @@ function CodeSnippet({ children }: { children: string }) {
       }}
     >
       <code className="text-accent/90">{children}</code>
-      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
+      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
         {copied ? "copied!" : "click to copy"}
       </span>
     </div>
@@ -325,7 +325,7 @@ function BigDownloadButton({
         </div>
         <div className="text-xs text-text-muted mt-0.5">
           {sublabel}
-          {version && <span className="text-text-muted/50"> · v{version}</span>}
+          {version && <span className="text-text-muted/70"> · v{version}</span>}
         </div>
       </div>
       <Download className="w-5 h-5 text-accent/60 group-hover:text-accent transition-colors shrink-0" />
@@ -365,7 +365,7 @@ function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAss
           <div className="font-mono text-xs text-text-secondary space-y-2 mt-4">
             <p className="text-text-muted">or install via homebrew:</p>
             <CodeSnippet>brew tap magnuspladsen/cheatsheet && brew install cheatsheet-app</CodeSnippet>
-            <p className="text-[10px] text-text-muted mt-2">
+            <p className="text-[11px] text-text-muted mt-2">
               first launch fix if needed:{" "}
               <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
             </p>
@@ -408,7 +408,7 @@ function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAss
           <div className="font-mono text-xs text-text-secondary space-y-2 mt-4">
             <p className="text-text-muted">or install via aur (arch linux):</p>
             <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
-            <p className="text-[10px] text-text-muted mt-1">
+            <p className="text-[11px] text-text-muted mt-1">
               or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
             </p>
           </div>
@@ -482,7 +482,7 @@ function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAss
                 icon={<Terminal className="w-4 h-4 text-text-muted" />}
               >
                 <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
-                <p className="text-[10px] text-text-muted mt-1">
+                <p className="text-[11px] text-text-muted mt-1">
                   or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
                 </p>
               </InstallBlock>
@@ -528,7 +528,7 @@ function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAss
                 icon={<Apple className="w-4 h-4 text-text-muted" />}
               >
                 <CodeSnippet>brew tap magnuspladsen/cheatsheet && brew install cheatsheet-app</CodeSnippet>
-                <p className="text-[10px] text-text-muted mt-2">
+                <p className="text-[11px] text-text-muted mt-2">
                   first launch fix if needed:{" "}
                   <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
                 </p>
@@ -599,7 +599,7 @@ export default function LandingPage() {
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 text-[10px] bg-amber-400/10 text-amber-400 border border-amber-400/20 rounded tracking-wider">
+                <span className="px-2 py-0.5 text-[11px] bg-amber-400/10 text-amber-400 border border-amber-400/20 rounded tracking-wider">
                   early development
                 </span>
               </div>

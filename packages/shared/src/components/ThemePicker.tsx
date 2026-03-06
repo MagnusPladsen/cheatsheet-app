@@ -34,14 +34,14 @@ export function ThemePicker({ currentTheme, themes, onSelect }: ThemePickerProps
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-2 h-7 border border-border text-text-muted hover:text-accent hover:border-accent/20 transition-colors text-[10px] tracking-wider"
+        className="flex items-center gap-1.5 px-2 h-7 border border-border text-text-muted hover:text-accent hover:border-accent/20 transition-colors text-[11px] tracking-wider"
       >
         <span
           className="w-2 h-2 rounded-full shrink-0"
           style={{ backgroundColor: currentTheme.accent }}
         />
         {lc(currentTheme.name)}
-        <span className="text-text-muted/50">▾</span>
+        <span className="text-text-muted/70">▾</span>
       </button>
 
       {open && (
