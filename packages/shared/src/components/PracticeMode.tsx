@@ -276,10 +276,10 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-text-primary">{lc(label)}</span>
                   {m === "dailyChallenge" && dailyDone && (
-                    <span className="text-[10px] text-text-muted">{lc("completed")}</span>
+                    <span className="text-[11px] text-text-muted">{lc("completed")}</span>
                   )}
                 </div>
-                <p className="text-[10px] text-text-muted mt-0.5">{lc(desc)}</p>
+                <p className="text-[11px] text-text-muted mt-0.5">{lc(desc)}</p>
               </button>
             ))}
           </div>
@@ -317,7 +317,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
 
             {/* By app */}
             <div className="pt-2 pb-1">
-              <p className="text-[10px] text-text-muted tracking-wider px-1">{lc("by app")}</p>
+              <p className="text-[11px] text-text-muted tracking-wider px-1">{lc("by app")}</p>
             </div>
             {appGroups.map(({ app, name, icon, color, count }) => (
               <button
@@ -335,7 +335,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
 
             {/* By category */}
             <div className="pt-2 pb-1">
-              <p className="text-[10px] text-text-muted tracking-wider px-1">{lc("by category")}</p>
+              <p className="text-[11px] text-text-muted tracking-wider px-1">{lc("by category")}</p>
             </div>
             {practiceCategories.map((cat) => {
               const count = practicable.filter((b) => b.category === cat).length;
@@ -421,13 +421,13 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
 
           {slowest.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] text-text-muted tracking-wider">{lc("slowest:")}</p>
+              <p className="text-[11px] text-text-muted tracking-wider">{lc("slowest:")}</p>
               {slowest.map((t, i) => (
                 <div key={i} className="flex items-center justify-between px-4 py-1.5 border border-border/50">
-                  <span className="text-[10px] text-text-secondary truncate mr-2">
+                  <span className="text-[11px] text-text-secondary truncate mr-2">
                     {lc(t.binding.action)}
                   </span>
-                  <span className="text-[10px] text-text-muted shrink-0">
+                  <span className="text-[11px] text-text-muted shrink-0">
                     {(t.responseMs / 1000).toFixed(1)}s
                   </span>
                 </div>
@@ -537,7 +537,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
             <span className={`text-sm ${app.color}`}>{app.icon}</span>
             <span className="text-xs text-text-muted">{lc(app.name)}</span>
             {current.mode && (
-              <span className="text-[10px] px-1 py-0.5 text-text-muted border border-border">
+              <span className="text-[11px] px-1 py-0.5 text-text-muted border border-border">
                 {lc(current.mode)}
               </span>
             )}
@@ -550,7 +550,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
           {/* Study mode: show the answer */}
           {mode === "study" && (
             <div className="pt-2">
-              <p className="text-[10px] text-text-muted mb-1">{lc("answer:")}</p>
+              <p className="text-[11px] text-text-muted mb-1">{lc("answer:")}</p>
               <KbdBadge keys={current.key} />
             </div>
           )}
@@ -561,7 +561,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
               {steps.map((step, i) => (
                 <span
                   key={i}
-                  className={`text-[10px] px-1.5 py-0.5 border ${
+                  className={`text-[11px] px-1.5 py-0.5 border ${
                     i < stepIndex
                       ? "border-accent/30 text-accent/50 bg-accent-dim"
                       : i === stepIndex
@@ -572,7 +572,7 @@ export function PracticeMode({ bindings, onClose }: PracticeModeProps) {
                   {i < stepIndex ? step : i === stepIndex ? step : "?"}
                 </span>
               ))}
-              <span className="text-[10px] text-text-muted ml-1">
+              <span className="text-[11px] text-text-muted ml-1">
                 [{stepIndex + 1}/{steps.length}]
               </span>
             </div>

@@ -33,7 +33,7 @@ export function BindingCard({ binding, matches }: BindingCardProps) {
     <div className="card-hover-accent flex items-center gap-3 px-3 py-2 bg-bg-card border border-border">
       <KbdBadge keys={binding.key} />
       <Tooltip content={binding.action}>
-        <p className="text-xs text-text-secondary truncate">
+        <p className="text-sm text-text-secondary truncate leading-snug">
           {matches ? (
             <HighlightedText text={lc(binding.action)} fieldKey="action" matches={matches} />
           ) : (
@@ -43,16 +43,16 @@ export function BindingCard({ binding, matches }: BindingCardProps) {
       </Tooltip>
       <div className="flex items-center gap-1 shrink-0">
         {binding.mode && (
-          <span className="text-[10px] px-1 py-0.5 text-text-muted border border-border">
+          <span className="text-[11px] px-1.5 py-0.5 text-text-muted border border-border">
             {lc(binding.mode)}
           </span>
         )}
         {binding.isCustom ? (
-          <span className="text-[10px] px-1 py-0.5 text-accent/70 bg-accent-dim">
+          <span className="text-[11px] px-1 py-0.5 text-accent/70 bg-accent-dim">
             {lc("cstm")}
           </span>
         ) : (
-          <span className="text-[10px] px-1 py-0.5 text-text-muted bg-bg-secondary">
+          <span className="text-[11px] px-1 py-0.5 text-text-muted bg-bg-secondary">
             {lc("dflt")}
           </span>
         )}

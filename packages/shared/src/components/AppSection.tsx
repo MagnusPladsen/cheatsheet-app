@@ -39,7 +39,7 @@ export function AppSection({ appId, results, index }: AppSectionProps) {
         <span className="text-xs text-text-muted tracking-wider">
           [{results.length}]
           {customCount > 0 && defaultCount > 0 && (
-            <span className="ml-1 text-text-muted/50">{customCount}c/{defaultCount}d</span>
+            <span className="ml-1 text-text-muted/70">{customCount}c/{defaultCount}d</span>
           )}
         </span>
         <span
@@ -56,7 +56,7 @@ export function AppSection({ appId, results, index }: AppSectionProps) {
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([category, catResults]) => (
             <div key={category}>
-              <h3 className="text-xs text-accent/50 tracking-widest mb-1.5 pl-0.5">
+              <h3 className="text-xs text-accent/70 tracking-widest mb-1.5 pl-0.5">
                 -- {lc(category)}
               </h3>
               <div className="grid gap-px sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
