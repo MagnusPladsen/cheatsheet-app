@@ -13,15 +13,18 @@ interface UseBindingsReturn {
   refresh: () => void;
 }
 
-export function useBindings(ghRepo: GitHubRepo | null): UseBindingsReturn {
+export function useBindings(repos: GitHubRepo[]): UseBindingsReturn {
   const [bindings, setBindings] = useState<Binding[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
+  // Stable serialized key for deps
+  const reposKey = repos.map((r) => `${r.owner}/${r.repo}`).join(",");
+
   const fetchBindings = useCallback(async (force = false) => {
-    if (!ghRepo) return;
+    if (repos.length === 0) return;
 
     setLoading(true);
     setError(null);
@@ -32,10 +35,12 @@ export function useBindings(ghRepo: GitHubRepo | null): UseBindingsReturn {
       resetIdCounter();
       const customBindings: Binding[] = [];
 
-      for (const app of APP_LIST) {
-        const files = await fetchAllFiles(ghRepo.owner, ghRepo.repo, app.filePaths);
-        const parsed = parsers[app.id](files);
-        customBindings.push(...parsed);
+      for (const ghRepo of repos) {
+        for (const app of APP_LIST) {
+          const files = await fetchAllFiles(ghRepo.owner, ghRepo.repo, app.filePaths);
+          const parsed = parsers[app.id](files);
+          customBindings.push(...parsed);
+        }
       }
 
       const defaults = getDefaultBindings();
@@ -46,10 +51,10 @@ export function useBindings(ghRepo: GitHubRepo | null): UseBindingsReturn {
     } finally {
       setLoading(false);
     }
-  }, [ghRepo?.owner, ghRepo?.repo]);
+  }, [reposKey]);
 
   useEffect(() => {
-    if (!ghRepo) {
+    if (repos.length === 0) {
       setBindings([]);
       setLoading(false);
       return;
@@ -57,7 +62,7 @@ export function useBindings(ghRepo: GitHubRepo | null): UseBindingsReturn {
     fetchBindings();
     intervalRef.current = setInterval(() => fetchBindings(), 5 * 60 * 1000);
     return () => clearInterval(intervalRef.current);
-  }, [fetchBindings, ghRepo]);
+  }, [fetchBindings, reposKey]);
 
   const refresh = useCallback(() => fetchBindings(true), [fetchBindings]);
 

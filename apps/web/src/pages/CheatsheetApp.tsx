@@ -19,10 +19,10 @@ import {
 } from "@cheatsheet/shared";
 import type { AppId, SearchResult, Binding } from "@cheatsheet/shared";
 import { useBindings } from "../hooks/useBindings.ts";
-import { useGitHubRepo } from "../hooks/useGitHubRepo.ts";
+import { useGitHubRepos } from "../hooks/useGitHubRepo.ts";
 import { clearCache } from "../services/cache.ts";
 
-function RepoSetup({ onSave }: { onSave: (input: string) => boolean }) {
+function RepoSetup({ onAdd }: { onAdd: (input: string) => boolean }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,11 +36,13 @@ function RepoSetup({ onSave }: { onSave: (input: string) => boolean }) {
       setError("enter a github repo url or owner/repo");
       return;
     }
-    const ok = onSave(input);
+    const ok = onAdd(input);
     if (!ok) {
       setError("invalid format. use owner/repo or a github url");
       return;
     }
+    setInput("");
+    setError("");
   };
 
   return (
@@ -82,7 +84,7 @@ function RepoSetup({ onSave }: { onSave: (input: string) => boolean }) {
           </button>
 
           <p className="text-[10px] text-text-muted leading-relaxed">
-            {lc("the repo must be public. your choice is saved to this browser.")}
+            {lc("the repo must be public. you can add multiple repos.")}
             <br />
             {lc("for private configs, use the")}{" "}
             <a href="/#download" className="text-accent/60 hover:text-accent transition-colors">
@@ -96,44 +98,49 @@ function RepoSetup({ onSave }: { onSave: (input: string) => boolean }) {
   );
 }
 
-function RepoConfigModal({
-  currentOwner,
-  currentRepo,
-  onSave,
-  onDisconnect,
+function RepoManagerModal({
+  repos,
+  onAdd,
+  onRemove,
+  onDisconnectAll,
   onClose,
 }: {
-  currentOwner: string;
-  currentRepo: string;
-  onSave: (input: string) => boolean;
-  onDisconnect: () => void;
+  repos: { owner: string; repo: string }[];
+  onAdd: (input: string) => boolean;
+  onRemove: (index: number) => void;
+  onDisconnectAll: () => void;
   onClose: () => void;
 }) {
-  const [input, setInput] = useState(`${currentOwner}/${currentRepo}`);
+  const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
-    inputRef.current?.select();
   }, []);
 
-  const handleSave = () => {
+  const handleAdd = () => {
     if (!input.trim()) {
       setError("enter a github repo url or owner/repo");
       return;
     }
-    const ok = onSave(input);
+    const ok = onAdd(input);
     if (!ok) {
       setError("invalid format. use owner/repo or a github url");
       return;
     }
+    setInput("");
+    setError("");
     clearCache();
-    onClose();
   };
 
-  const handleDisconnect = () => {
-    onDisconnect();
+  const handleRemove = (index: number) => {
+    onRemove(index);
+    clearCache();
+  };
+
+  const handleDisconnectAll = () => {
+    onDisconnectAll();
     clearCache();
   };
 
@@ -144,26 +151,68 @@ function RepoConfigModal({
       role="dialog"
       aria-modal
     >
-      <div className="w-full max-w-md mx-4 border border-border bg-bg-primary p-6 space-y-4">
+      <div className="w-full max-w-lg mx-4 border border-border bg-bg-primary p-6 space-y-4">
         <div>
           <h3 className="text-sm text-text-primary font-medium tracking-wider mb-1">
-            {lc("// configure dotfiles repo")}
+            {lc("// manage repos")}
           </h3>
           <p className="text-xs text-text-muted leading-relaxed">
-            {lc("change your github dotfiles repo or disconnect.")}
+            {lc("add or remove github dotfiles repos. bindings from all repos are merged.")}
           </p>
         </div>
 
+        {/* Current repos */}
+        {repos.length > 0 && (
+          <div className="space-y-1.5">
+            {repos.map((r, i) => (
+              <div
+                key={`${r.owner}/${r.repo}`}
+                className="flex items-center justify-between px-3 py-2 bg-bg-secondary border border-border"
+              >
+                <a
+                  href={`https://github.com/${r.owner}/${r.repo}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-accent/70 hover:text-accent transition-colors"
+                >
+                  {r.owner}/{r.repo}
+                </a>
+                <button
+                  onClick={() => handleRemove(i)}
+                  className="text-[10px] text-red-400/60 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
+                >
+                  {lc("remove")}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add new repo */}
         <div className="space-y-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => { setInput(e.target.value); setError(""); }}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") onClose(); }}
-            placeholder="owner/repo or https://github.com/owner/repo"
-            className="w-full px-3 py-2 bg-bg-secondary border border-border text-xs text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-accent/50 transition-colors"
-          />
+          <label className="text-[10px] text-text-muted tracking-wider">
+            {lc("// add repo")}
+          </label>
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(""); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAdd();
+                if (e.key === "Escape") onClose();
+              }}
+              placeholder="owner/repo or https://github.com/owner/repo"
+              className="flex-1 px-3 py-2 bg-bg-secondary border border-border text-xs text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-accent/50 transition-colors"
+            />
+            <button
+              onClick={handleAdd}
+              className="px-3 py-2 border border-accent/50 text-accent text-xs tracking-wider hover:bg-accent/10 transition-colors cursor-pointer shrink-0"
+            >
+              {lc("add")}
+            </button>
+          </div>
           {error && (
             <p className="text-[10px] text-red-400 tracking-wider">{lc(error)}</p>
           )}
@@ -171,25 +220,17 @@ function RepoConfigModal({
 
         <div className="flex items-center justify-between pt-2">
           <button
-            onClick={handleDisconnect}
+            onClick={handleDisconnectAll}
             className="text-[10px] text-red-400/70 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
           >
-            {lc("disconnect repo")}
+            {lc("disconnect all")}
           </button>
-          <div className="flex gap-2">
-            <button
-              onClick={onClose}
-              className="px-3 py-1.5 text-xs text-text-muted hover:text-text-primary transition-colors tracking-wider cursor-pointer"
-            >
-              {lc("cancel")}
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-3 py-1.5 border border-accent/50 text-accent text-xs tracking-wider hover:bg-accent/10 transition-colors cursor-pointer"
-            >
-              {lc("save & reload")}
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs text-text-muted hover:text-text-primary transition-colors tracking-wider cursor-pointer"
+          >
+            {lc("close")}
+          </button>
         </div>
       </div>
     </div>
@@ -197,8 +238,8 @@ function RepoConfigModal({
 }
 
 export default function CheatsheetApp() {
-  const { repo: ghRepo, setRepo, clearRepo } = useGitHubRepo();
-  const { bindings: fetchedBindings, loading, error, lastFetched, refresh } = useBindings(ghRepo);
+  const { repos, addRepo, removeRepo, clearRepos } = useGitHubRepos();
+  const { bindings: fetchedBindings, loading, error, lastFetched, refresh } = useBindings(repos);
   const [showRepoConfig, setShowRepoConfig] = useState(false);
 
   const [sharedBindings] = useState<Binding[] | null>(() => {
@@ -257,9 +298,9 @@ export default function CheatsheetApp() {
     return () => window.removeEventListener("keydown", handler);
   }, [searchOutOfView, stableSetSearch]);
 
-  // No repo configured and not viewing shared bindings — show setup
-  if (!ghRepo && !isSharedView) {
-    return <RepoSetup onSave={setRepo} />;
+  // No repos configured and not viewing shared bindings — show setup
+  if (repos.length === 0 && !isSharedView) {
+    return <RepoSetup onAdd={addRepo} />;
   }
 
   const groupedByApp = useMemo(() => {
@@ -295,24 +336,29 @@ export default function CheatsheetApp() {
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         {/* Repo indicator bar */}
-        {ghRepo && (
+        {repos.length > 0 && (
           <div className="border border-border bg-bg-secondary/30 px-4 py-2.5 flex items-center justify-between">
             <p className="text-[10px] text-text-muted tracking-wider">
               {lc("// source:")}{" "}
-              <a
-                href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-accent/60 hover:text-accent transition-colors"
-              >
-                {ghRepo.owner}/{ghRepo.repo}
-              </a>
+              {repos.map((r, i) => (
+                <span key={`${r.owner}/${r.repo}`}>
+                  {i > 0 && <span className="text-text-muted/40"> + </span>}
+                  <a
+                    href={`https://github.com/${r.owner}/${r.repo}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-accent/60 hover:text-accent transition-colors"
+                  >
+                    {r.owner}/{r.repo}
+                  </a>
+                </span>
+              ))}
             </p>
             <button
               onClick={() => setShowRepoConfig(true)}
               className="text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
             >
-              {lc("change repo")}
+              {lc("manage repos")}
             </button>
           </div>
         )}
@@ -417,29 +463,34 @@ export default function CheatsheetApp() {
         />
       )}
 
-      {showRepoConfig && ghRepo && (
-        <RepoConfigModal
-          currentOwner={ghRepo.owner}
-          currentRepo={ghRepo.repo}
-          onSave={setRepo}
-          onDisconnect={clearRepo}
+      {showRepoConfig && (
+        <RepoManagerModal
+          repos={repos}
+          onAdd={addRepo}
+          onRemove={removeRepo}
+          onDisconnectAll={clearRepos}
           onClose={() => setShowRepoConfig(false)}
         />
       )}
 
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-text-muted tracking-wider">
-          {ghRepo && (
+          {repos.length > 0 && (
             <>
               {lc("// live from")}{" "}
-              <a
-                href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
-                className="text-accent/40 hover:text-accent transition-colors"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {lc(`${ghRepo.owner}/${ghRepo.repo}`)}
-              </a>
+              {repos.map((r, i) => (
+                <span key={`${r.owner}/${r.repo}`}>
+                  {i > 0 && ", "}
+                  <a
+                    href={`https://github.com/${r.owner}/${r.repo}`}
+                    className="text-accent/40 hover:text-accent transition-colors"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {lc(`${r.owner}/${r.repo}`)}
+                  </a>
+                </span>
+              ))}
               {" "}&middot;{" "}
             </>
           )}

@@ -1,17 +1,18 @@
 import { useState, useCallback } from "react";
 
-const STORAGE_KEY = "cheatsheet_github_repo";
+const STORAGE_KEY = "cheatsheet_github_repos";
+// Migration: old single-repo key
+const LEGACY_KEY = "cheatsheet_github_repo";
 
 export interface GitHubRepo {
   owner: string;
   repo: string;
 }
 
-function parseRepoInput(input: string): GitHubRepo | null {
+export function parseRepoInput(input: string): GitHubRepo | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // Handle full GitHub URLs: https://github.com/owner/repo
   const urlMatch = trimmed.match(
     /(?:https?:\/\/)?(?:www\.)?github\.com\/([^/\s]+)\/([^/\s#?]+)/
   );
@@ -19,7 +20,6 @@ function parseRepoInput(input: string): GitHubRepo | null {
     return { owner: urlMatch[1], repo: urlMatch[2].replace(/\.git$/, "") };
   }
 
-  // Handle owner/repo format
   const slashMatch = trimmed.match(/^([^/\s]+)\/([^/\s]+)$/);
   if (slashMatch) {
     return { owner: slashMatch[1], repo: slashMatch[2].replace(/\.git$/, "") };
@@ -28,31 +28,73 @@ function parseRepoInput(input: string): GitHubRepo | null {
   return null;
 }
 
-function loadRepo(): GitHubRepo | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed.owner && parsed.repo) return parsed;
-  } catch {}
-  return null;
+function repoKey(r: GitHubRepo): string {
+  return `${r.owner}/${r.repo}`;
 }
 
-export function useGitHubRepo() {
-  const [repo, setRepoState] = useState<GitHubRepo | null>(loadRepo);
+function dedupe(repos: GitHubRepo[]): GitHubRepo[] {
+  const seen = new Set<string>();
+  return repos.filter((r) => {
+    const k = repoKey(r);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
 
-  const setRepo = useCallback((input: string): boolean => {
+function loadRepos(): GitHubRepo[] {
+  try {
+    // Try new multi-repo key
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    // Migrate from legacy single-repo key
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy);
+      if (parsed.owner && parsed.repo) {
+        const repos = [parsed];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(repos));
+        localStorage.removeItem(LEGACY_KEY);
+        return repos;
+      }
+    }
+  } catch {}
+  return [];
+}
+
+function saveRepos(repos: GitHubRepo[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(repos));
+}
+
+export function useGitHubRepos() {
+  const [repos, setReposState] = useState<GitHubRepo[]>(loadRepos);
+
+  const addRepo = useCallback((input: string): boolean => {
     const parsed = parseRepoInput(input);
     if (!parsed) return false;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-    setRepoState(parsed);
+    setReposState((prev) => {
+      const next = dedupe([...prev, parsed]);
+      saveRepos(next);
+      return next;
+    });
     return true;
   }, []);
 
-  const clearRepo = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setRepoState(null);
+  const removeRepo = useCallback((index: number) => {
+    setReposState((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      saveRepos(next);
+      return next;
+    });
   }, []);
 
-  return { repo, setRepo, clearRepo };
+  const clearRepos = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setReposState([]);
+  }, []);
+
+  return { repos, addRepo, removeRepo, clearRepos };
 }
