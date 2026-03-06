@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
   Search,
@@ -17,6 +17,53 @@ import {
   Github,
   ExternalLink,
 } from "lucide-react";
+
+type UserOS = "mac" | "linux-arch" | "linux-deb" | "linux-rpm" | "linux" | "unknown";
+
+function detectOS(): UserOS {
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("mac")) return "mac";
+  if (ua.includes("linux")) return "linux";
+  return "unknown";
+}
+
+interface ReleaseAssets {
+  dmgArm: string | null;
+  dmgIntel: string | null;
+  deb: string | null;
+  rpm: string | null;
+  appImage: string | null;
+  version: string | null;
+}
+
+function useLatestRelease(): ReleaseAssets {
+  const [assets, setAssets] = useState<ReleaseAssets>({
+    dmgArm: null, dmgIntel: null, deb: null, rpm: null, appImage: null, version: null,
+  });
+
+  useEffect(() => {
+    fetch("https://api.github.com/repos/MagnusPladsen/my-cheatsheet/releases/latest")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data?.assets) return;
+        const find = (test: (name: string) => boolean): string | null =>
+          data.assets.find((a: { name: string }) => test(a.name))?.browser_download_url ?? null;
+        setAssets({
+          dmgArm: find((n) => n.endsWith(".dmg") && n.includes("aarch64")),
+          dmgIntel: find((n) => n.endsWith(".dmg") && (n.includes("x64") || n.includes("x86_64"))),
+          deb: find((n) => n.endsWith(".deb")),
+          rpm: find((n) => n.endsWith(".rpm")),
+          appImage: find((n) => n.endsWith(".AppImage")),
+          version: data.tag_name?.replace(/^v/, "") ?? null,
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  return assets;
+}
+
+const RELEASES_URL = "https://github.com/MagnusPladsen/my-cheatsheet/releases/latest";
 
 const SUPPORTED_TOOLS = [
   { name: "Neovim", color: "#57A143" },
@@ -248,10 +295,218 @@ function CodeSnippet({ children }: { children: string }) {
   );
 }
 
+function DownloadLink({ href, children }: { href: string | null; children: React.ReactNode }) {
+  return (
+    <a
+      href={href || RELEASES_URL}
+      target="_blank"
+      rel="noreferrer"
+      className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer"
+    >
+      <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
+      <span className="text-xs group-hover:text-accent transition-colors">{children}</span>
+    </a>
+  );
+}
+
+function MacBlock({ release }: { release: ReleaseAssets }) {
+  return (
+    <>
+      <InstallBlock
+        title="macos (homebrew)"
+        icon={<Apple className="w-4 h-4 text-text-muted" />}
+      >
+        <p className="text-text-muted mb-2">recommended. auto-updates via brew.</p>
+        <CodeSnippet>brew tap magnuspladsen/cheatsheet</CodeSnippet>
+        <CodeSnippet>brew install cheatsheet-app</CodeSnippet>
+        <p className="text-[10px] text-text-muted mt-2">
+          first launch fix if needed:{" "}
+          <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
+        </p>
+      </InstallBlock>
+      <InstallBlock
+        title="macos (direct download)"
+        icon={<Apple className="w-4 h-4 text-text-muted" />}
+      >
+        <p className="text-text-muted mb-2">
+          download the .dmg for your architecture.
+          {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
+        </p>
+        <div className="space-y-1.5">
+          <DownloadLink href={release.dmgArm}>apple silicon (m1/m2/m3/m4)</DownloadLink>
+          <DownloadLink href={release.dmgIntel}>intel</DownloadLink>
+        </div>
+      </InstallBlock>
+    </>
+  );
+}
+
+function ArchBlock() {
+  return (
+    <InstallBlock
+      title="arch linux (aur)"
+      icon={<Terminal className="w-4 h-4 text-text-muted" />}
+    >
+      <p className="text-text-muted mb-2">available on the aur. use your preferred aur helper.</p>
+      <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
+      <p className="text-[10px] text-text-muted mt-1">
+        or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
+      </p>
+    </InstallBlock>
+  );
+}
+
+function DebBlock({ release }: { release: ReleaseAssets }) {
+  return (
+    <InstallBlock
+      title="debian / ubuntu / mint"
+      icon={<Terminal className="w-4 h-4 text-text-muted" />}
+    >
+      <p className="text-text-muted mb-2">
+        download the .deb
+        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
+        {" "}and install:
+      </p>
+      <DownloadLink href={release.deb}>download .deb</DownloadLink>
+      <div className="mt-2" />
+      <CodeSnippet>sudo dpkg -i cheatsheet_*_amd64.deb</CodeSnippet>
+      <CodeSnippet>sudo apt-get install -f</CodeSnippet>
+    </InstallBlock>
+  );
+}
+
+function RpmBlock({ release }: { release: ReleaseAssets }) {
+  return (
+    <InstallBlock
+      title="fedora / rhel"
+      icon={<Terminal className="w-4 h-4 text-text-muted" />}
+    >
+      <p className="text-text-muted mb-2">
+        download the .rpm
+        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
+        {" "}and install:
+      </p>
+      <DownloadLink href={release.rpm}>download .rpm</DownloadLink>
+      <div className="mt-2" />
+      <CodeSnippet>sudo rpm -i cheatsheet-*.x86_64.rpm</CodeSnippet>
+    </InstallBlock>
+  );
+}
+
+function AppImageBlock({ release }: { release: ReleaseAssets }) {
+  return (
+    <InstallBlock
+      title="appimage (any linux)"
+      icon={<Terminal className="w-4 h-4 text-text-muted" />}
+    >
+      <p className="text-text-muted mb-2">
+        universal linux binary.
+        {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
+      </p>
+      <DownloadLink href={release.appImage}>download .appimage</DownloadLink>
+      <div className="mt-2" />
+      <CodeSnippet>chmod +x cheatsheet_*_amd64.AppImage</CodeSnippet>
+      <CodeSnippet>./cheatsheet_*_amd64.AppImage</CodeSnippet>
+    </InstallBlock>
+  );
+}
+
+function DownloadGrid({ userOS, release }: { userOS: UserOS; release: ReleaseAssets }) {
+  // Recommended block for detected OS
+  const recommended = userOS === "mac" ? (
+    <div className="md:col-span-2 border border-accent/30 bg-accent/[0.03] rounded-lg p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Apple className="w-4 h-4 text-accent" />
+        <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
+        <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
+          macos detected
+        </span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="font-mono text-xs text-text-secondary space-y-2">
+          <p className="text-text-muted mb-2">homebrew (auto-updates):</p>
+          <CodeSnippet>brew tap magnuspladsen/cheatsheet</CodeSnippet>
+          <CodeSnippet>brew install cheatsheet-app</CodeSnippet>
+          <p className="text-[10px] text-text-muted mt-2">
+            first launch fix if needed:{" "}
+            <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
+          </p>
+        </div>
+        <div className="font-mono text-xs text-text-secondary space-y-2">
+          <p className="text-text-muted mb-2">
+            or download directly
+            {release.version && <span className="text-text-muted/50"> (v{release.version})</span>}
+            :
+          </p>
+          <DownloadLink href={release.dmgArm}>apple silicon (m1/m2/m3/m4) .dmg</DownloadLink>
+          <DownloadLink href={release.dmgIntel}>intel .dmg</DownloadLink>
+        </div>
+      </div>
+    </div>
+  ) : userOS.startsWith("linux") ? (
+    <div className="md:col-span-2 border border-accent/30 bg-accent/[0.03] rounded-lg p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Terminal className="w-4 h-4 text-accent" />
+        <h4 className="text-sm text-accent font-medium tracking-wider">recommended for your os</h4>
+        <span className="px-1.5 py-0.5 text-[9px] bg-accent/10 text-accent border border-accent/20 rounded tracking-wider">
+          linux detected
+        </span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="font-mono text-xs text-text-secondary space-y-2">
+          <p className="text-text-muted mb-1">arch (aur):</p>
+          <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
+        </div>
+        <div className="font-mono text-xs text-text-secondary space-y-2">
+          <p className="text-text-muted mb-1">debian / ubuntu:</p>
+          <DownloadLink href={release.deb}>download .deb</DownloadLink>
+        </div>
+        <div className="font-mono text-xs text-text-secondary space-y-2">
+          <p className="text-text-muted mb-1">fedora / rhel:</p>
+          <DownloadLink href={release.rpm}>download .rpm</DownloadLink>
+        </div>
+      </div>
+      <div className="mt-3 font-mono text-xs text-text-secondary space-y-2">
+        <p className="text-text-muted mb-1">or use the universal appimage:</p>
+        <DownloadLink href={release.appImage}>download .appimage</DownloadLink>
+      </div>
+    </div>
+  ) : null;
+
+  // Other OS blocks shown below
+  const otherBlocks = userOS === "mac" ? (
+    <>
+      <ArchBlock />
+      <DebBlock release={release} />
+      <RpmBlock release={release} />
+      <AppImageBlock release={release} />
+    </>
+  ) : userOS.startsWith("linux") ? (
+    <MacBlock release={release} />
+  ) : (
+    <>
+      <MacBlock release={release} />
+      <ArchBlock />
+      <DebBlock release={release} />
+      <RpmBlock release={release} />
+      <AppImageBlock release={release} />
+    </>
+  );
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {recommended}
+      {otherBlocks}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const featuresSection = useInView();
   const toolsSection = useInView();
   const downloadSection = useInView();
+  const userOS = useMemo(() => detectOS(), []);
+  const release = useLatestRelease();
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary overflow-x-hidden">
@@ -561,7 +816,7 @@ export default function LandingPage() {
             </div>
             <p className="text-xs text-text-secondary mb-4">
               try cheatsheet in your browser. connect your public github dotfiles repo to see your own
-              bindings, or browse the defaults. no signup required.
+              bindings. no signup required.
             </p>
             <Link
               to="/app"
@@ -572,118 +827,8 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Desktop download grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InstallBlock
-              title="macos (homebrew)"
-              icon={<Apple className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">recommended for macos users. auto-updates via brew.</p>
-              <CodeSnippet>brew tap magnuspladsen/cheatsheet</CodeSnippet>
-              <CodeSnippet>brew install cheatsheet-app</CodeSnippet>
-              <p className="text-[10px] text-text-muted mt-2">
-                first launch fix if needed:{" "}
-                <code className="text-accent/60">xattr -cr /Applications/cheatsheet.app</code>
-              </p>
-            </InstallBlock>
-
-            <InstallBlock
-              title="macos (direct download)"
-              icon={<Apple className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">download the .dmg for your architecture.</p>
-              <div className="space-y-1.5">
-                <a
-                  href="https://github.com/MagnusPladsen/my-cheatsheet/releases/latest"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer"
-                >
-                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
-                  <span className="group-hover:text-accent transition-colors">apple silicon (m1/m2/m3/m4)</span>
-                </a>
-                <a
-                  href="https://github.com/MagnusPladsen/my-cheatsheet/releases/latest"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 border border-border rounded hover:border-accent/30 transition-colors group cursor-pointer"
-                >
-                  <FileDown className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
-                  <span className="group-hover:text-accent transition-colors">intel</span>
-                </a>
-              </div>
-            </InstallBlock>
-
-            <InstallBlock
-              title="arch linux (aur)"
-              icon={<Terminal className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">available on the aur. use your preferred aur helper.</p>
-              <CodeSnippet>yay -S cheatsheet-app-bin</CodeSnippet>
-              <p className="text-[10px] text-text-muted mt-1">
-                or: <code className="text-accent/60">paru -S cheatsheet-app-bin</code>
-              </p>
-            </InstallBlock>
-
-            <InstallBlock
-              title="debian / ubuntu / mint"
-              icon={<Terminal className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">
-                download the .deb from{" "}
-                <a
-                  href="https://github.com/MagnusPladsen/my-cheatsheet/releases/latest"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent/60 hover:text-accent transition-colors"
-                >
-                  latest release
-                </a>
-                , then:
-              </p>
-              <CodeSnippet>sudo dpkg -i cheatsheet_*_amd64.deb</CodeSnippet>
-              <CodeSnippet>sudo apt-get install -f</CodeSnippet>
-            </InstallBlock>
-
-            <InstallBlock
-              title="fedora / rhel"
-              icon={<Terminal className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">
-                download the .rpm from{" "}
-                <a
-                  href="https://github.com/MagnusPladsen/my-cheatsheet/releases/latest"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent/60 hover:text-accent transition-colors"
-                >
-                  latest release
-                </a>
-                , then:
-              </p>
-              <CodeSnippet>sudo rpm -i cheatsheet-*.x86_64.rpm</CodeSnippet>
-            </InstallBlock>
-
-            <InstallBlock
-              title="appimage (any linux)"
-              icon={<Terminal className="w-4 h-4 text-text-muted" />}
-            >
-              <p className="text-text-muted mb-2">
-                universal linux binary. download from{" "}
-                <a
-                  href="https://github.com/MagnusPladsen/my-cheatsheet/releases/latest"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent/60 hover:text-accent transition-colors"
-                >
-                  latest release
-                </a>
-                .
-              </p>
-              <CodeSnippet>chmod +x cheatsheet_*_amd64.AppImage</CodeSnippet>
-              <CodeSnippet>./cheatsheet_*_amd64.AppImage</CodeSnippet>
-            </InstallBlock>
-          </div>
+          {/* Desktop download — OS-aware ordering */}
+          <DownloadGrid userOS={userOS} release={release} />
         </div>
       </section>
 
