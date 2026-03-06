@@ -15,7 +15,7 @@ interface UseBindingsReturn {
 
 export function useBindings(repos: GitHubRepo[]): UseBindingsReturn {
   const [bindings, setBindings] = useState<Binding[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(repos.length > 0);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);

@@ -52,7 +52,7 @@ export function ExportButton({ contentRef, onSaveFile }: ExportButtonProps) {
       <button
         onClick={() => setOpen((s) => !s)}
         disabled={exporting}
-        className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider disabled:opacity-50"
+        className="px-2 py-1 text-xs text-text-muted hover:text-accent border border-transparent hover:border-accent/20 transition-colors tracking-wider disabled:opacity-50"
       >
         {exporting ? lc("exporting...") : lc("export")}
       </button>

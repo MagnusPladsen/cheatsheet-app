@@ -406,10 +406,10 @@ export default function CheatsheetApp() {
           onReset={resetFilters}
         />
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setShowPractice(true)}
-            className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
+            className="px-2 py-1 text-xs text-text-muted hover:text-accent border border-transparent hover:border-accent/20 transition-colors tracking-wider"
           >
             {lc("practice")}
           </button>
@@ -424,10 +424,10 @@ export default function CheatsheetApp() {
           {conflictCount > 0 && (
             <button
               onClick={toggleConflicts}
-              className={`text-xs tracking-wider transition-colors ${
+              className={`px-2 py-1 text-xs tracking-wider border transition-colors ${
                 showConflicts
-                  ? "text-amber-400"
-                  : "text-text-muted hover:text-amber-400"
+                  ? "text-amber-400 border-amber-400/20"
+                  : "text-text-muted hover:text-amber-400 border-transparent hover:border-amber-400/20"
               }`}
             >
               {showConflicts ? lc("hide overlaps") : lc("overlaps")}{" "}

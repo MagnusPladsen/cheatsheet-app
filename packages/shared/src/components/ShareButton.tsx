@@ -37,7 +37,7 @@ export function ShareButton({ bindings, filteredBindings, activeCategory }: Shar
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((s) => !s)}
-        className="text-xs text-text-muted hover:text-accent transition-colors tracking-wider"
+        className="px-2 py-1 text-xs text-text-muted hover:text-accent border border-transparent hover:border-accent/20 transition-colors tracking-wider"
       >
         {copied ? lc("copied!") : lc("share")}
       </button>
