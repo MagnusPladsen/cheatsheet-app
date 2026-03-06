@@ -7,8 +7,6 @@ export interface GitHubRepo {
   repo: string;
 }
 
-const DEFAULT_REPO: GitHubRepo = { owner: "MagnusPladsen", repo: "dotfiles" };
-
 function parseRepoInput(input: string): GitHubRepo | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
@@ -30,20 +28,18 @@ function parseRepoInput(input: string): GitHubRepo | null {
   return null;
 }
 
-function loadRepo(): GitHubRepo {
+function loadRepo(): GitHubRepo | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_REPO;
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (parsed.owner && parsed.repo) return parsed;
   } catch {}
-  return DEFAULT_REPO;
+  return null;
 }
 
 export function useGitHubRepo() {
-  const [repo, setRepoState] = useState<GitHubRepo>(loadRepo);
-  const isDefault =
-    repo.owner === DEFAULT_REPO.owner && repo.repo === DEFAULT_REPO.repo;
+  const [repo, setRepoState] = useState<GitHubRepo | null>(loadRepo);
 
   const setRepo = useCallback((input: string): boolean => {
     const parsed = parseRepoInput(input);
@@ -53,10 +49,10 @@ export function useGitHubRepo() {
     return true;
   }, []);
 
-  const resetRepo = useCallback(() => {
+  const clearRepo = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    setRepoState(DEFAULT_REPO);
+    setRepoState(null);
   }, []);
 
-  return { repo, setRepo, resetRepo, isDefault };
+  return { repo, setRepo, clearRepo };
 }

@@ -13,14 +13,16 @@ interface UseBindingsReturn {
   refresh: () => void;
 }
 
-export function useBindings(ghRepo: GitHubRepo): UseBindingsReturn {
+export function useBindings(ghRepo: GitHubRepo | null): UseBindingsReturn {
   const [bindings, setBindings] = useState<Binding[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const fetchBindings = useCallback(async (force = false) => {
+    if (!ghRepo) return;
+
     setLoading(true);
     setError(null);
 
@@ -44,13 +46,18 @@ export function useBindings(ghRepo: GitHubRepo): UseBindingsReturn {
     } finally {
       setLoading(false);
     }
-  }, [ghRepo.owner, ghRepo.repo]);
+  }, [ghRepo?.owner, ghRepo?.repo]);
 
   useEffect(() => {
+    if (!ghRepo) {
+      setBindings([]);
+      setLoading(false);
+      return;
+    }
     fetchBindings();
     intervalRef.current = setInterval(() => fetchBindings(), 5 * 60 * 1000);
     return () => clearInterval(intervalRef.current);
-  }, [fetchBindings]);
+  }, [fetchBindings, ghRepo]);
 
   const refresh = useCallback(() => fetchBindings(true), [fetchBindings]);
 

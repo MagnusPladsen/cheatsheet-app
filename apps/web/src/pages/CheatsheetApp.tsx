@@ -22,24 +22,8 @@ import { useBindings } from "../hooks/useBindings.ts";
 import { useGitHubRepo } from "../hooks/useGitHubRepo.ts";
 import { clearCache } from "../services/cache.ts";
 
-function RepoConfigModal({
-  currentOwner,
-  currentRepo,
-  isDefault,
-  onSave,
-  onReset,
-  onClose,
-}: {
-  currentOwner: string;
-  currentRepo: string;
-  isDefault: boolean;
-  onSave: (input: string) => boolean;
-  onReset: () => void;
-  onClose: () => void;
-}) {
-  const [input, setInput] = useState(
-    isDefault ? "" : `${currentOwner}/${currentRepo}`
-  );
+function RepoSetup({ onSave }: { onSave: (input: string) => boolean }) {
+  const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,14 +41,100 @@ function RepoConfigModal({
       setError("invalid format. use owner/repo or a github url");
       return;
     }
+  };
+
+  return (
+    <div className="min-h-screen bg-bg-primary text-text-primary flex items-center justify-center px-6">
+      <div className="w-full max-w-md space-y-6">
+        <div className="space-y-3">
+          <h1 className="text-2xl font-display text-text-primary">
+            <span className="text-accent">~/</span>{lc("cheatsheet")}
+          </h1>
+          <p className="text-xs text-text-muted leading-relaxed">
+            {lc("connect your public github dotfiles repo to view your keybindings.")}
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <label className="text-[10px] text-text-muted tracking-wider">
+              {lc("// github dotfiles repo")}
+            </label>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(""); }}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
+              placeholder="owner/repo or https://github.com/owner/repo"
+              className="w-full px-3 py-2.5 bg-bg-secondary border border-border text-sm text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+            />
+            {error && (
+              <p className="text-[10px] text-red-400 tracking-wider">{lc(error)}</p>
+            )}
+          </div>
+
+          <button
+            onClick={handleSave}
+            className="w-full px-4 py-2.5 bg-accent text-bg-primary text-sm font-medium tracking-wider hover:bg-accent-light transition-colors cursor-pointer"
+          >
+            {lc("connect & load bindings")}
+          </button>
+
+          <p className="text-[10px] text-text-muted leading-relaxed">
+            {lc("the repo must be public. your choice is saved to this browser.")}
+            <br />
+            {lc("for private configs, use the")}{" "}
+            <a href="/#download" className="text-accent/60 hover:text-accent transition-colors">
+              {lc("desktop app")}
+            </a>
+            {lc(".")}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RepoConfigModal({
+  currentOwner,
+  currentRepo,
+  onSave,
+  onDisconnect,
+  onClose,
+}: {
+  currentOwner: string;
+  currentRepo: string;
+  onSave: (input: string) => boolean;
+  onDisconnect: () => void;
+  onClose: () => void;
+}) {
+  const [input, setInput] = useState(`${currentOwner}/${currentRepo}`);
+  const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  const handleSave = () => {
+    if (!input.trim()) {
+      setError("enter a github repo url or owner/repo");
+      return;
+    }
+    const ok = onSave(input);
+    if (!ok) {
+      setError("invalid format. use owner/repo or a github url");
+      return;
+    }
     clearCache();
     onClose();
   };
 
-  const handleReset = () => {
-    onReset();
+  const handleDisconnect = () => {
+    onDisconnect();
     clearCache();
-    onClose();
   };
 
   return (
@@ -80,7 +150,7 @@ function RepoConfigModal({
             {lc("// configure dotfiles repo")}
           </h3>
           <p className="text-xs text-text-muted leading-relaxed">
-            {lc("enter your github dotfiles repo to see your own keybindings.")}
+            {lc("change your github dotfiles repo or disconnect.")}
           </p>
         </div>
 
@@ -97,22 +167,15 @@ function RepoConfigModal({
           {error && (
             <p className="text-[10px] text-red-400 tracking-wider">{lc(error)}</p>
           )}
-          <p className="text-[10px] text-text-muted">
-            {lc("the repo must be public. config files are read from the repo root.")}
-          </p>
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <div>
-            {!isDefault && (
-              <button
-                onClick={handleReset}
-                className="text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
-              >
-                {lc("reset to default")}
-              </button>
-            )}
-          </div>
+          <button
+            onClick={handleDisconnect}
+            className="text-[10px] text-red-400/70 hover:text-red-400 transition-colors tracking-wider cursor-pointer"
+          >
+            {lc("disconnect repo")}
+          </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
@@ -134,7 +197,7 @@ function RepoConfigModal({
 }
 
 export default function CheatsheetApp() {
-  const { repo: ghRepo, setRepo, resetRepo, isDefault } = useGitHubRepo();
+  const { repo: ghRepo, setRepo, clearRepo } = useGitHubRepo();
   const { bindings: fetchedBindings, loading, error, lastFetched, refresh } = useBindings(ghRepo);
   const [showRepoConfig, setShowRepoConfig] = useState(false);
 
@@ -194,6 +257,11 @@ export default function CheatsheetApp() {
     return () => window.removeEventListener("keydown", handler);
   }, [searchOutOfView, stableSetSearch]);
 
+  // No repo configured and not viewing shared bindings — show setup
+  if (!ghRepo && !isSharedView) {
+    return <RepoSetup onSave={setRepo} />;
+  }
+
   const groupedByApp = useMemo(() => {
     const map = new Map<AppId, SearchResult[]>();
     for (const app of APP_LIST) {
@@ -227,28 +295,27 @@ export default function CheatsheetApp() {
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         {/* Repo indicator bar */}
-        <div className="border border-border bg-bg-secondary/30 px-4 py-2.5 flex items-center justify-between">
-          <p className="text-[10px] text-text-muted tracking-wider">
-            {lc("// source:")}{" "}
-            <a
-              href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-accent/60 hover:text-accent transition-colors"
+        {ghRepo && (
+          <div className="border border-border bg-bg-secondary/30 px-4 py-2.5 flex items-center justify-between">
+            <p className="text-[10px] text-text-muted tracking-wider">
+              {lc("// source:")}{" "}
+              <a
+                href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-accent/60 hover:text-accent transition-colors"
+              >
+                {ghRepo.owner}/{ghRepo.repo}
+              </a>
+            </p>
+            <button
+              onClick={() => setShowRepoConfig(true)}
+              className="text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
             >
-              {ghRepo.owner}/{ghRepo.repo}
-            </a>
-            {isDefault && (
-              <span className="text-text-muted/40 ml-1.5">(default)</span>
-            )}
-          </p>
-          <button
-            onClick={() => setShowRepoConfig(true)}
-            className="text-[10px] text-text-muted hover:text-accent transition-colors tracking-wider cursor-pointer"
-          >
-            {lc("change repo")}
-          </button>
-        </div>
+              {lc("change repo")}
+            </button>
+          </div>
+        )}
 
         {isSharedView && (
           <div className="border border-accent/30 bg-accent-dim px-4 py-3 flex items-center justify-between">
@@ -350,29 +417,33 @@ export default function CheatsheetApp() {
         />
       )}
 
-      {showRepoConfig && (
+      {showRepoConfig && ghRepo && (
         <RepoConfigModal
           currentOwner={ghRepo.owner}
           currentRepo={ghRepo.repo}
-          isDefault={isDefault}
           onSave={setRepo}
-          onReset={resetRepo}
+          onDisconnect={clearRepo}
           onClose={() => setShowRepoConfig(false)}
         />
       )}
 
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-text-muted tracking-wider">
-          {lc("// live from")}{" "}
-          <a
-            href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
-            className="text-accent/40 hover:text-accent transition-colors"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {lc(`${ghRepo.owner}/${ghRepo.repo}`)}
-          </a>
-          {" "}&middot; {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
+          {ghRepo && (
+            <>
+              {lc("// live from")}{" "}
+              <a
+                href={`https://github.com/${ghRepo.owner}/${ghRepo.repo}`}
+                className="text-accent/40 hover:text-accent transition-colors"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {lc(`${ghRepo.owner}/${ghRepo.repo}`)}
+              </a>
+              {" "}&middot;{" "}
+            </>
+          )}
+          {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
         </p>
       </footer>
     </div>
