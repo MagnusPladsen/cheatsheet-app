@@ -11,7 +11,6 @@ export const APPS: Record<AppId, AppConfig> = {
       ".config/nvim/lua/plugins/astrolsp.lua",
       ".config/nvim/lua/mappings.lua",
       ".config/nvim/init.lua",
-      ".vimrc",
     ],
   },
   zed: {
@@ -55,6 +54,99 @@ export const APPS: Record<AppId, AppConfig> = {
     icon: "\u270F\uFE0F",
     color: "text-orange-400",
     filePaths: [".config/espanso/match/base.yml"],
+  },
+  vim: {
+    id: "vim",
+    name: "Vim",
+    icon: "\uD83D\uDCD7",
+    color: "text-green-300",
+    filePaths: [".vimrc"],
+  },
+  vscode: {
+    id: "vscode",
+    name: "VS Code",
+    icon: "\uD83D\uDD37",
+    color: "text-blue-500",
+    filePaths: [
+      "Library/Application Support/Code/User/keybindings.json",
+      ".config/Code/User/keybindings.json",
+    ],
+  },
+  cursor: {
+    id: "cursor",
+    name: "Cursor",
+    icon: "\uD83D\uDDB1\uFE0F",
+    color: "text-violet-400",
+    filePaths: [
+      "Library/Application Support/Cursor/User/keybindings.json",
+      ".config/Cursor/User/keybindings.json",
+    ],
+  },
+  ghostty: {
+    id: "ghostty",
+    name: "Ghostty",
+    icon: "\uD83D\uDC7B",
+    color: "text-slate-300",
+    filePaths: [".config/ghostty/config"],
+  },
+  wezterm: {
+    id: "wezterm",
+    name: "WezTerm",
+    icon: "\u2B1B",
+    color: "text-indigo-400",
+    filePaths: [".wezterm.lua", ".config/wezterm/wezterm.lua"],
+  },
+  alacritty: {
+    id: "alacritty",
+    name: "Alacritty",
+    icon: "\uD83D\uDDA5\uFE0F",
+    color: "text-yellow-300",
+    filePaths: [
+      ".config/alacritty/alacritty.toml",
+      ".alacritty.toml",
+    ],
+  },
+  lazygit: {
+    id: "lazygit",
+    name: "Lazygit",
+    icon: "\uD83E\uDDA5",
+    color: "text-teal-400",
+    filePaths: [
+      ".config/lazygit/config.yml",
+      "Library/Application Support/lazygit/config.yml",
+    ],
+  },
+  skhd: {
+    id: "skhd",
+    name: "skhd",
+    icon: "\u2328\uFE0F",
+    color: "text-red-400",
+    filePaths: [".skhdrc", ".config/skhd/skhdrc"],
+  },
+  i3: {
+    id: "i3",
+    name: "i3 / Sway",
+    icon: "\uD83E\uDE9F",
+    color: "text-sky-400",
+    filePaths: [
+      ".config/i3/config",
+      ".config/sway/config",
+      ".i3/config",
+    ],
+  },
+  hyprland: {
+    id: "hyprland",
+    name: "Hyprland",
+    icon: "\uD83D\uDCA0",
+    color: "text-cyan-300",
+    filePaths: [".config/hypr/hyprland.conf"],
+  },
+  obsidian: {
+    id: "obsidian",
+    name: "Obsidian",
+    icon: "\uD83D\uDC8E",
+    color: "text-purple-300",
+    filePaths: [".obsidian/hotkeys.json"],
   },
 };
 

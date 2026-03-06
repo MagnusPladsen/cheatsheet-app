@@ -11,46 +11,7 @@ export function parseNeovim(files: Map<string, string>): Binding[] {
     if (path.endsWith(".lua")) {
       bindings.push(...parseVimKeymapSet(content));
     }
-    if (path.endsWith(".vimrc")) {
-      bindings.push(...parseVimrc(content));
-    }
-  }
-
-  return bindings;
-}
-
-// Parse .vimrc vimscript mappings
-function parseVimrc(content: string): Binding[] {
-  const bindings: Binding[] = [];
-  const MAP_REGEX = /^(n|i|v|x|c|t)?(?:nore)?map(?:\s+<buffer>)?(?:\s+<expr>)?\s+(\S+)\s+(.+)/;
-  const MODE_MAP: Record<string, string> = {
-    n: "normal", i: "insert", v: "visual", x: "visual",
-    c: "command", t: "terminal", "": "normal",
-  };
-
-  for (const rawLine of content.split("\n")) {
-    const line = rawLine.trim();
-    if (line.startsWith('"') || !line) continue;
-
-    const commentIdx = line.lastIndexOf('" ');
-    const comment = commentIdx > 0 ? line.slice(commentIdx + 2).trim() : "";
-
-    const match = line.match(MAP_REGEX);
-    if (!match) continue;
-
-    const [, modeChar = "n", key, actionRaw] = match;
-    const action = comment || actionRaw.split('"')[0].trim();
-
-    bindings.push({
-      id: makeId("neovim"),
-      app: "neovim",
-      key: formatKey(key),
-      action,
-      mode: MODE_MAP[modeChar] || modeChar,
-      category: categorize(key, action, "vimrc"),
-      isCustom: true,
-      raw: line,
-    });
+    // .vimrc is handled by the dedicated vim parser
   }
 
   return bindings;
@@ -227,7 +188,6 @@ function parseVimKeymapSet(content: string): Binding[] {
 function formatKey(key: string): string {
   return key
     .replace(/<Leader>/gi, "Space")
-    .replace(/<leader>/gi, "Space")
     .replace(/<C-([^>]+)>/gi, (_, k) => `Ctrl+${k.toUpperCase()}`)
     .replace(/<M-([^>]+)>/gi, (_, k) => `Alt+${k.toUpperCase()}`)
     .replace(/<A-([^>]+)>/gi, (_, k) => `Alt+${k.toUpperCase()}`)

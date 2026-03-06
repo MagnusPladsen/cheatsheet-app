@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# TypeScript build output
+*.d.ts
+*.d.ts.map
+tsconfig.tsbuildinfo
+
 # Tauri
 apps/desktop/src-tauri/target
 apps/desktop/src-tauri/gen
