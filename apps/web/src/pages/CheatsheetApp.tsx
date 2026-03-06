@@ -422,7 +422,7 @@ export default function CheatsheetApp() {
                   : "text-text-muted hover:text-amber-400"
               }`}
             >
-              {showConflicts ? lc("hide conflicts") : lc("conflicts")}{" "}
+              {showConflicts ? lc("hide overlaps") : lc("overlaps")}{" "}
               <span className="text-amber-400/60">[{conflictCount}]</span>
             </button>
           )}

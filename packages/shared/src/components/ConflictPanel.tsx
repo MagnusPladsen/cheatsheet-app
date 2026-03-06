@@ -19,7 +19,10 @@ export function ConflictPanel({ conflicts }: ConflictPanelProps) {
   return (
     <div className="space-y-3">
       <p className="text-xs text-amber-400/70 tracking-wider">
-        {lc(`// ${conflicts.length} key conflict${conflicts.length === 1 ? "" : "s"} across apps`)}
+        {lc(`// ${conflicts.length} overlapping key${conflicts.length === 1 ? "" : "s"} across apps`)}
+      </p>
+      <p className="text-[10px] text-text-muted leading-relaxed">
+        {lc("note: same keybinding in different apps is usually not a real conflict — most tools have independent key scopes and don't interfere with each other.")}
       </p>
       {conflicts.map((group) => (
         <div

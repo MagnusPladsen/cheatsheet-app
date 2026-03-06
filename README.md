@@ -11,6 +11,8 @@
 
 A developer keybinding cheatsheet that parses your actual config files and displays all your bindings in a searchable, filterable UI. Available as a [web app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app) (connect your GitHub dotfiles repo) and a native [desktop app](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest) (reads local config files directly).
 
+> **Early development** — this app is stable and working, but still under active development. Some features are incomplete and parsers may not catch every config format. Feedback and bug reports are welcome via [GitHub Issues](https://github.com/MagnusPladsen/my-cheatsheet/issues).
+
 <!-- IMAGE: hero screenshot of the app showing the main UI with bindings -->
 
 ## Supported Tools
@@ -41,8 +43,8 @@ A developer keybinding cheatsheet that parses your actual config files and displ
 
 - **Fuzzy search** across all bindings with highlighted matches
 - **Filter by app** to focus on specific tools
-- **Conflict detection** to find overlapping keybindings across tools
-- **Practice mode** to test your keybinding knowledge
+- **Overlap detection** to find shared keybindings across tools (note: overlapping keys in different apps are not necessarily conflicts — most tools have independent key scopes)
+- **Practice mode** *(experimental)* to test your keybinding knowledge — has known issues with some key combos
 - **Export** bindings as JSON, PNG, or PDF
 - **Share** bindings via URL
 - **12 themes** — hacker, tokyo night, dracula, catppuccin, nord, gruvbox, kanagawa, monokai, rose pine, and more
@@ -142,11 +144,11 @@ The web version can connect to any public GitHub dotfiles repo to display your k
 
 <!-- IMAGE: screenshot showing filter bar with some apps selected -->
 
-4. **Detect conflicts** — open the conflict panel to find keybindings that overlap across different tools
+4. **Detect overlaps** — open the overlap panel to find shared keybindings across tools (note: same key in different apps is usually fine — they have independent scopes)
 
-<!-- IMAGE: screenshot of conflict detection -->
+<!-- IMAGE: screenshot of overlap detection -->
 
-5. **Practice mode** — test yourself on bindings. The app shows you a command and you type the correct keybinding
+5. **Practice mode** *(experimental)* — test yourself on bindings. The app shows you a command and you type the correct keybinding. Some key combos may not register correctly
 
 <!-- IMAGE: screenshot of practice mode -->
 
