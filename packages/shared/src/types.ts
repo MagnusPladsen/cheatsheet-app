@@ -1,11 +1,22 @@
 export type AppId =
   | "neovim"
+  | "vim"
   | "zed"
+  | "vscode"
+  | "cursor"
   | "aerospace"
   | "tmux"
   | "kitty"
+  | "ghostty"
+  | "wezterm"
+  | "alacritty"
   | "zsh"
-  | "espanso";
+  | "espanso"
+  | "lazygit"
+  | "skhd"
+  | "i3"
+  | "hyprland"
+  | "obsidian";
 
 export interface Binding {
   id: string;
