@@ -230,7 +230,12 @@ jobs:
         id: sha
         run: |
           DEB_SHA=$(sha256sum artifacts/*.deb | awk '{print $1}')
+          if [ -z "$DEB_SHA" ]; then
+            echo "ERROR: Failed to compute SHA256 for .deb package"
+            exit 1
+          fi
           echo "deb=$DEB_SHA" >> "$GITHUB_OUTPUT"
+          echo "SHA256: $DEB_SHA"
 
       - name: Setup SSH for AUR
         env:
@@ -258,6 +263,9 @@ jobs:
           cd aur-repo
           sed -i "s/^pkgver=.*/pkgver=${VERSION}/" PKGBUILD
           sed -i "s/^sha256sums_x86_64=.*/sha256sums_x86_64=('${DEB_SHA}')/" PKGBUILD
+
+          # Validate PKGBUILD has real checksum (not empty)
+          grep -q "sha256sums_x86_64=('.\+')" PKGBUILD || { echo "ERROR: PKGBUILD has empty sha256sum"; exit 1; }
 
           # Generate .SRCINFO from PKGBUILD
           python3 -c "
