@@ -4,7 +4,7 @@ pkgver=1.1.0
 pkgrel=1
 pkgdesc="Developer keybinding cheatsheet for neovim, tmux, aerospace, and more"
 arch=('x86_64')
-url="https://github.com/MagnusPladsen/my-cheatsheet"
+url="https://github.com/MagnusPladsen/cheatsheet-app"
 license=('MIT')
 depends=(
   'cairo'
