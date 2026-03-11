@@ -1,0 +1,213 @@
+name: Distribute
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  update-homebrew:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download macOS DMGs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p artifacts
+          gh release download "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "*.dmg" \
+            --dir artifacts
+          ls -la artifacts/
+
+      - name: Compute SHA256 checksums
+        id: sha
+        run: |
+          cd artifacts
+          for f in *.dmg; do
+            echo "File: $f"
+            sha256sum "$f"
+          done
+          ARM64_SHA=$(sha256sum *aarch64*.dmg | awk '{print $1}')
+          X64_SHA=$(sha256sum *x64*.dmg 2>/dev/null | awk '{print $1}')
+          if [ -z "$X64_SHA" ]; then
+            X64_SHA=$(sha256sum *x86_64*.dmg | awk '{print $1}')
+          fi
+          echo "arm64=$ARM64_SHA" >> "$GITHUB_OUTPUT"
+          echo "x64=$X64_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Update Homebrew cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARM64_SHA="${{ steps.sha.outputs.arm64 }}"
+          X64_SHA="${{ steps.sha.outputs.x64 }}"
+
+          # Fetch current cask formula
+          CURRENT=$(curl -s -H "Authorization: token $HOMEBREW_TAP_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet-app.rb")
+
+          FILE_SHA=$(echo "$CURRENT" | jq -r '.sha')
+
+          # Generate updated formula
+          FORMULA=$(cat <<'RUBY'
+          cask "cheatsheet-app" do
+            arch arm: "aarch64", intel: "x64"
+
+            version "VERSION_PLACEHOLDER"
+            sha256 arm:   "ARM64_SHA_PLACEHOLDER",
+                   intel: "X64_SHA_PLACEHOLDER"
+
+            url "https://github.com/MagnusPladsen/cheatsheet-app/releases/download/v#{version}/cheatsheet_#{version}_#{arch}.dmg"
+            name "Cheatsheet"
+            desc "Developer keybinding cheatsheet for neovim, tmux, aerospace, and more"
+            homepage "https://github.com/MagnusPladsen/cheatsheet-app"
+
+            app "cheatsheet.app"
+
+            zap trash: [
+              "~/Library/Application Support/com.magnuspladsen.cheatsheet",
+            ]
+          end
+          RUBY
+          )
+
+          FORMULA="${FORMULA//VERSION_PLACEHOLDER/$VERSION}"
+          FORMULA="${FORMULA//ARM64_SHA_PLACEHOLDER/$ARM64_SHA}"
+          FORMULA="${FORMULA//X64_SHA_PLACEHOLDER/$X64_SHA}"
+
+          # Base64 encode
+          CONTENT=$(echo "$FORMULA" | base64 -w 0)
+
+          # Update file via GitHub API
+          curl -s -X PUT \
+            -H "Authorization: token $HOMEBREW_TAP_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/MagnusPladsen/homebrew-cheatsheet/contents/Casks/cheatsheet-app.rb" \
+            -d "{\"message\":\"Update cheatsheet to v${VERSION}\",\"content\":\"${CONTENT}\",\"sha\":\"${FILE_SHA}\"}"
+
+  update-aur:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download .deb package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p artifacts
+          gh release download "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "*.deb" \
+            --dir artifacts
+          ls -la artifacts/
+
+      - name: Compute SHA256 checksum
+        id: sha
+        run: |
+          DEB_SHA=$(sha256sum artifacts/*.deb | awk '{print $1}')
+          if [ -z "$DEB_SHA" ]; then
+            echo "ERROR: Failed to compute SHA256 for .deb package"
+            exit 1
+          fi
+          echo "deb=$DEB_SHA" >> "$GITHUB_OUTPUT"
+          echo "SHA256: $DEB_SHA"
+
+      - name: Setup SSH for AUR
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<'EOF'
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/aur
+            User aur
+          EOF
+
+      - name: Clone AUR repo and update
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DEB_SHA="${{ steps.sha.outputs.deb }}"
+
+          git clone ssh://aur@aur.archlinux.org/cheatsheet-app-bin.git aur-repo
+
+          # Copy PKGBUILD template from repo and update version + sha
+          cp cheatsheet-app-bin/PKGBUILD aur-repo/PKGBUILD
+          cd aur-repo
+          sed -i "s/^pkgver=.*/pkgver=${VERSION}/" PKGBUILD
+          sed -i "s/^sha256sums_x86_64=.*/sha256sums_x86_64=('${DEB_SHA}')/" PKGBUILD
+
+          # Validate PKGBUILD has real checksum (not empty)
+          grep -q "sha256sums_x86_64=('.\+')" PKGBUILD || { echo "ERROR: PKGBUILD has empty sha256sum"; exit 1; }
+
+          # Generate .SRCINFO from PKGBUILD
+          python3 -c "
+          import re
+
+          with open('PKGBUILD') as f:
+              content = f.read()
+
+          def get(key):
+              m = re.search(rf\"^{key}=(.*)$\", content, re.M)
+              return m.group(1).strip().strip(\"'\\\"\") if m else ''
+
+          def get_list(key):
+              m = re.search(rf\"^{key}=\((.*?)\)\", content, re.M | re.S)
+              if not m: return []
+              return [x.strip().strip(\"'\\\"\") for x in m.group(1).split() if x.strip().strip(\"'\\\"\")]
+
+          pkgname = get('pkgname')
+          pkgver = get('pkgver')
+          pkgrel = get('pkgrel')
+          pkgdesc = get('pkgdesc')
+          url = get('url')
+          arch = get_list('arch')
+          license_ = get_list('license')
+          depends = get_list('depends')
+          options = get_list('options')
+
+          source_url = url + f'/releases/download/v{pkgver}/cheatsheet_{pkgver}_amd64.deb'
+          sha = get_list('sha256sums_x86_64')
+
+          lines = [f'pkgbase = {pkgname}']
+          lines.append(f'\tpkgdesc = {pkgdesc}')
+          lines.append(f'\tpkgver = {pkgver}')
+          lines.append(f'\tpkgrel = {pkgrel}')
+          lines.append(f'\turl = {url}')
+          for a in arch: lines.append(f'\tarch = {a}')
+          for l in license_: lines.append(f'\tlicense = {l}')
+          for d in depends: lines.append(f'\tdepends = {d}')
+          for o in options: lines.append(f'\toptions = {o}')
+          lines.append(f'\tsource_x86_64 = {source_url}')
+          if sha: lines.append(f'\tsha256sums_x86_64 = {sha[0]}')
+          lines.append('')
+          lines.append(f'pkgname = {pkgname}')
+
+          with open('.SRCINFO', 'w') as f:
+              f.write('\n'.join(lines) + '\n')
+          "
+
+          # Commit and push
+          git config user.email "magnuspladsen@users.noreply.github.com"
+          git config user.name "Magnus Pladsen"
+          git add PKGBUILD .SRCINFO
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update to v${VERSION}"
+          git push
