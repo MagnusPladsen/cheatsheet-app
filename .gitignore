@@ -21,6 +21,9 @@ tsconfig.tsbuildinfo
 apps/desktop/src-tauri/target
 apps/desktop/src-tauri/gen
 
+# External repos
+homebrew-cheatsheet
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
