@@ -20,12 +20,15 @@ interface HeaderProps {
   lastFetched: Date | null;
   totalBindings: number;
   compactSearch?: CompactSearchProps & { visible: boolean };
+  updateAvailable?: boolean;
+  onUpdateClick?: () => void;
 }
 
 export function Header({
   theme, themes, onSetTheme,
   onRefresh, loading, lastFetched, totalBindings,
   compactSearch,
+  updateAvailable, onUpdateClick,
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-bg-primary/95 backdrop-blur-sm border-b border-border">
@@ -39,6 +42,15 @@ export function Header({
           </span>
         </div>
         <div className="flex items-center gap-1.5">
+          {updateAvailable && onUpdateClick && (
+            <button
+              onClick={onUpdateClick}
+              className="px-2 py-1 text-[11px] text-accent border border-accent/30 hover:bg-accent/10 transition-colors tracking-wider cursor-pointer animate-pulse"
+              title="Update available"
+            >
+              {lc("update")}
+            </button>
+          )}
           <RefreshButton onRefresh={onRefresh} loading={loading} lastFetched={lastFetched} />
           <ThemePicker currentTheme={theme} themes={themes} onSelect={onSetTheme} />
         </div>

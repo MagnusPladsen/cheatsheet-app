@@ -26,6 +26,33 @@ import { writeFile } from "@tauri-apps/plugin-fs";
 import { FolderPicker } from "./components/FolderPicker.tsx";
 import { useUpdater } from "./hooks/useUpdater.ts";
 
+function UpdateBanner({ updater }: { updater: ReturnType<typeof useUpdater> }) {
+  if (!updater.available || updater.dismissed) return null;
+
+  return (
+    <div className="bg-accent/10 border-b border-accent/30 px-6 py-3 flex items-center justify-between">
+      <p className="text-xs text-accent tracking-wider">
+        {lc(`update available: v${updater.version}`)}
+      </p>
+      <div className="flex gap-3">
+        <button
+          onClick={updater.dismiss}
+          className="text-xs text-text-muted hover:text-text-primary transition-colors tracking-wider cursor-pointer"
+        >
+          {lc("later")}
+        </button>
+        <button
+          onClick={updater.install}
+          disabled={updater.installing}
+          className="px-3 py-1 border border-accent/50 text-accent text-xs tracking-wider hover:bg-accent/10 transition-colors cursor-pointer disabled:opacity-50"
+        >
+          {updater.installing ? lc("installing...") : lc("update & restart")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const { bindings, loading, error, lastFetched, refresh, folders, addFolder, removeFolder } = useBindings();
   const {
@@ -133,30 +160,17 @@ export default function App() {
           totalCount: bindings.length,
           inputRef: compactSearchRef,
         }}
+        updateAvailable={updater.available && !updater.dismissed}
+        onUpdateClick={() => {
+          if (updater.available) {
+            updater.install();
+          } else {
+            updater.checkForUpdates();
+          }
+        }}
       />
 
-      {updater.available && !updater.dismissed && (
-        <div className="bg-accent/10 border-b border-accent/30 px-6 py-3 flex items-center justify-between">
-          <p className="text-xs text-accent tracking-wider">
-            {lc(`update available: v${updater.version}`)}
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={updater.dismiss}
-              className="text-xs text-text-muted hover:text-text-primary transition-colors tracking-wider cursor-pointer"
-            >
-              {lc("later")}
-            </button>
-            <button
-              onClick={updater.install}
-              disabled={updater.installing}
-              className="px-3 py-1 border border-accent/50 text-accent text-xs tracking-wider hover:bg-accent/10 transition-colors cursor-pointer disabled:opacity-50"
-            >
-              {updater.installing ? lc("installing...") : lc("update & restart")}
-            </button>
-          </div>
-        </div>
-      )}
+      <UpdateBanner updater={updater} />
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         {/* Settings toggle */}
@@ -256,12 +270,26 @@ export default function App() {
         />
       )}
 
-      <footer className="border-t border-border py-6 text-center">
+      <footer className="border-t border-border py-6 text-center space-y-2">
         <p className="text-xs text-text-muted tracking-wider">
           {appVersion && <>{lc(`v${appVersion}`)}{" "}&middot;{" "}</>}
           {lc("// reading local configs")}
           {" "}&middot; {lc("press")} <kbd className="px-1 py-0.5 bg-kbd-bg border border-kbd-border text-xs text-accent">/</kbd> {lc("to search")}
         </p>
+        <button
+          onClick={updater.checkForUpdates}
+          disabled={updater.checking}
+          className="text-[11px] text-text-muted/70 hover:text-accent transition-colors tracking-wider cursor-pointer disabled:opacity-50"
+        >
+          {updater.checking
+            ? lc("checking...")
+            : updater.available
+              ? lc(`v${updater.version} available — click to update`)
+              : lc("check for updates")}
+        </button>
+        {updater.error && (
+          <p className="text-[11px] text-red-400/70 tracking-wider">{lc(updater.error)}</p>
+        )}
       </footer>
     </div>
   );
