@@ -152,10 +152,10 @@ jobs:
             sha256 arm:   "ARM64_SHA_PLACEHOLDER",
                    intel: "X64_SHA_PLACEHOLDER"
 
-            url "https://github.com/MagnusPladsen/my-cheatsheet/releases/download/v#{version}/cheatsheet_#{version}_#{arch}.dmg"
+            url "https://github.com/MagnusPladsen/cheatsheet-app/releases/download/v#{version}/cheatsheet_#{version}_#{arch}.dmg"
             name "Cheatsheet"
             desc "Developer keybinding cheatsheet for neovim, tmux, aerospace, and more"
-            homepage "https://github.com/MagnusPladsen/my-cheatsheet"
+            homepage "https://github.com/MagnusPladsen/cheatsheet-app"
 
             app "cheatsheet.app"
 

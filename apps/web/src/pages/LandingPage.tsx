@@ -42,7 +42,7 @@ function useLatestRelease(): ReleaseAssets {
   });
 
   useEffect(() => {
-    fetch("https://api.github.com/repos/MagnusPladsen/my-cheatsheet/releases/latest")
+    fetch("https://api.github.com/repos/MagnusPladsen/cheatsheet-app/releases/latest")
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!data?.assets) return;
@@ -63,7 +63,7 @@ function useLatestRelease(): ReleaseAssets {
   return assets;
 }
 
-const RELEASES_URL = "https://github.com/MagnusPladsen/my-cheatsheet/releases/latest";
+const RELEASES_URL = "https://github.com/MagnusPladsen/cheatsheet-app/releases/latest";
 
 const SUPPORTED_TOOLS = [
   { name: "Neovim", color: "#57A143" },
@@ -637,7 +637,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-4 pt-2">
               <a
-                href="https://github.com/MagnusPladsen/my-cheatsheet"
+                href="https://github.com/MagnusPladsen/cheatsheet-app"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent transition-colors cursor-pointer"
@@ -906,7 +906,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/MagnusPladsen/my-cheatsheet"
+              href="https://github.com/MagnusPladsen/cheatsheet-app"
               target="_blank"
               rel="noreferrer"
               className="text-xs text-text-muted hover:text-accent transition-colors cursor-pointer"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicoulaj/tauri/refs/heads/dev/crates/tauri-schema-generator/schemas/config.schema.json",
   "productName": "cheatsheet",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "identifier": "com.magnuspladsen.cheatsheet",
   "build": {
     "frontendDist": "../dist",
@@ -53,7 +53,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/MagnusPladsen/my-cheatsheet/releases/latest/download/latest.json"
+        "https://github.com/MagnusPladsen/cheatsheet-app/releases/latest/download/latest.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY2MkIxMTMxRkIzODQ2OTUKUldTVlJqajdNUkVyWnYyeEVUU0ZvSmxSY0ZzSjgxdVdWcnFBUk5sSWlSaldRNldUSldGcXUxNTcK"
     }

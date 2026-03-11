@@ -1,17 +1,17 @@
 # cheatsheet
 
-[![Release](https://github.com/MagnusPladsen/my-cheatsheet/actions/workflows/release.yml/badge.svg)](https://github.com/MagnusPladsen/my-cheatsheet/actions/workflows/release.yml)
-[![Latest Release](https://img.shields.io/github/v/release/MagnusPladsen/my-cheatsheet?label=latest)](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest)
-[![Vercel](https://img.shields.io/github/deployments/MagnusPladsen/my-cheatsheet/production?label=vercel&logo=vercel)](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app)
+[![Release](https://github.com/MagnusPladsen/cheatsheet-app/actions/workflows/release.yml/badge.svg)](https://github.com/MagnusPladsen/cheatsheet-app/actions/workflows/release.yml)
+[![Latest Release](https://img.shields.io/github/v/release/MagnusPladsen/cheatsheet-app?label=latest)](https://github.com/MagnusPladsen/cheatsheet-app/releases/latest)
+[![Vercel](https://img.shields.io/github/deployments/MagnusPladsen/cheatsheet-app/production?label=vercel&logo=vercel)](https://cheatsheet-app-web-git-main-magnus-pladsens-projects.vercel.app)
 [![AUR](https://img.shields.io/aur/version/cheatsheet-app-bin?logo=archlinux&label=AUR)](https://aur.archlinux.org/packages/cheatsheet-app-bin)
 [![Homebrew](https://img.shields.io/badge/homebrew-tap-orange?logo=homebrew)](https://github.com/MagnusPladsen/homebrew-cheatsheet)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![macOS](https://img.shields.io/badge/macOS-arm64%20%7C%20x64-black?logo=apple)
 ![Linux](https://img.shields.io/badge/Linux-x64-black?logo=linux&logoColor=white)
 
-A developer keybinding cheatsheet that parses your actual config files and displays all your bindings in a searchable, filterable UI. Available as a [web app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app) (connect your GitHub dotfiles repo) and a native [desktop app](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest) (reads local config files directly).
+A developer keybinding cheatsheet that parses your actual config files and displays all your bindings in a searchable, filterable UI. Available as a [web app](https://cheatsheet-app-web-git-main-magnus-pladsens-projects.vercel.app) (connect your GitHub dotfiles repo) and a native [desktop app](https://github.com/MagnusPladsen/cheatsheet-app/releases/latest) (reads local config files directly).
 
-> **Early development** — this app is stable and working, but still under active development. Some features are incomplete and parsers may not catch every config format. Feedback and bug reports are welcome via [GitHub Issues](https://github.com/MagnusPladsen/my-cheatsheet/issues).
+> **Early development** — this app is stable and working, but still under active development. Some features are incomplete and parsers may not catch every config format. Feedback and bug reports are welcome via [GitHub Issues](https://github.com/MagnusPladsen/cheatsheet-app/issues).
 
 <!-- IMAGE: hero screenshot of the app showing the main UI with bindings -->
 
@@ -89,7 +89,7 @@ brew install cheatsheet-app
 
 ### macOS (Direct Download)
 
-Download the `.dmg` for your architecture from the [latest release](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest):
+Download the `.dmg` for your architecture from the [latest release](https://github.com/MagnusPladsen/cheatsheet-app/releases/latest):
 - **Apple Silicon (M1/M2/M3/M4):** `cheatsheet_x.x.x_aarch64.dmg`
 - **Intel:** `cheatsheet_x.x.x_x64.dmg`
 
@@ -102,7 +102,7 @@ yay -S cheatsheet-app-bin
 
 ### Debian / Ubuntu / Linux Mint
 
-Download the `.deb` from the [latest release](https://github.com/MagnusPladsen/my-cheatsheet/releases/latest), then:
+Download the `.deb` from the [latest release](https://github.com/MagnusPladsen/cheatsheet-app/releases/latest), then:
 
 ```bash
 sudo dpkg -i cheatsheet_*_amd64.deb
@@ -124,7 +124,7 @@ chmod +x cheatsheet_*_amd64.AppImage
 
 ### Web App
 
-No install needed — use it directly at [my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app](https://my-cheatsheet-web-git-main-magnus-pladsens-projects.vercel.app).
+No install needed — use it directly at [cheatsheet-app-web-git-main-magnus-pladsens-projects.vercel.app](https://cheatsheet-app-web-git-main-magnus-pladsens-projects.vercel.app).
 
 The web version can connect to any public GitHub dotfiles repo to display your keybindings. Enter your repo URL (e.g. `username/dotfiles`) in the app and it's saved to your browser. No signup required.
 
