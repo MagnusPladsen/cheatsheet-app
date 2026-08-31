@@ -1,3 +1,5 @@
+![AI-assisted](https://img.shields.io/badge/built%20with-AI%20assistance-blue)
+
 # cheatsheet
 
 [![Release](https://github.com/MagnusPladsen/cheatsheet-app/actions/workflows/release.yml/badge.svg)](https://github.com/MagnusPladsen/cheatsheet-app/actions/workflows/release.yml)
